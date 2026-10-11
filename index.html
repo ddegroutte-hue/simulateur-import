@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulateur import véhicule</title>
+<style>
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f5f6fa;--card:#fff;--tx:#1b1f2a;--mut:#667085;--ac:#000091;--acbg:#e8eaff;--bd:#d9dce6;--ok:#0a7d4b;--warn:#b54708;--warnbg:#fff4e5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141c;--card:#1c2030;--tx:#eef0f7;--mut:#9aa3b8;--ac:#8c9bff;--acbg:#262c4d;--bd:#323850;--ok:#4cd694;--warn:#fdb022;--warnbg:#3a2a10}}
+:root[data-theme="dark"]{--bg:#12141c;--card:#1c2030;--tx:#eef0f7;--mut:#9aa3b8;--ac:#8c9bff;--acbg:#262c4d;--bd:#323850;--ok:#4cd694;--warn:#fdb022;--warnbg:#3a2a10}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+main{max-width:680px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.4rem;margin:0 0 4px}
+.sub{color:var(--mut);margin:0 0 20px;font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px}
+h2{font-size:1rem;margin:0 0 4px;color:var(--ac)}
+h3{font-size:.9rem;margin:16px 0 6px;color:var(--ac)}
+label{display:block;font-size:.88rem;font-weight:600;margin:12px 0 4px}
+select,input[type=number],input[type=date],input[type=text]{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:1rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:460px){.row2{grid-template-columns:1fr}}
+.chk{display:flex;gap:8px;align-items:center;font-weight:400;margin-top:12px}
+.chk input{width:18px;height:18px;flex:none}
+.hint{font-size:.78rem;color:var(--mut);margin-top:3px}
+.perso{font-size:.72rem;font-weight:400;color:var(--warn)}
+.res{background:var(--acbg);border-color:var(--ac)}
+.tot{font-size:2rem;font-weight:700;color:var(--ac);margin:0}
+.totsub{color:var(--mut);font-size:.88rem;margin:0 0 8px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td{padding:6px 0;border-bottom:1px solid var(--bd);vertical-align:top}
+td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
+tr.grp td{font-weight:700;color:var(--ac);border-bottom:2px solid var(--ac);padding-top:14px}
+tr.sub td{font-weight:700}
+tr.est td:first-child{color:var(--mut)}
+.alert{background:var(--warnbg);color:var(--warn);border-radius:8px;padding:10px 12px;font-size:.85rem;margin-top:10px}
+.note{font-size:.8rem;color:var(--mut);margin-top:12px}
+ul.chkl{margin:6px 0 0;padding-left:20px;font-size:.88rem}
+ul.chkl li{margin:4px 0}
+a{color:var(--ac)}
+.hide{display:none}
+.fretDet{margin:6px 0 10px}.fretDet summary{cursor:pointer;font-size:13px;color:var(--accent,#1a56db);padding:4px 0}
+.sgw{position:relative}.sug{position:absolute;left:0;right:0;top:100%;z-index:20;background:var(--card);border:1px solid var(--bd);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);max-height:240px;overflow:auto;margin-top:2px}.sug.hide{display:none}.sg{padding:9px 10px;cursor:pointer;font-size:.92rem;border-bottom:1px solid var(--bd)}.sg:last-child{border-bottom:0}.sg:hover,.sg.on{background:var(--acbg)}
+</style>
+</head>
+<body>
+<div id="boot" style="display:none;background:#fdecea;color:#b42318;padding:10px 12px;font-size:.9rem;font-weight:600"></div>
+<noscript><div style="background:#fff4e5;color:#7a2e0e;padding:12px;font-size:1rem;font-weight:600">JavaScript est désactivé ou bloqué : ce simulateur ne peut pas calculer. Sur iPhone, n'ouvrez pas le fichier depuis l'aperçu (Fichiers, Mail, Messages) : ouvrez-le dans Safari ou utilisez le lien de la page publiée.</div></noscript>
+<main>
+<h1>🌍 Simulateur d'import de véhicule d'occasion</h1>
+<p class="sub">Coût complet d'un véhicule d'occasion acheté à l'étranger (UE ou hors UE) et immatriculé en France : taxes d'import, certificat d'immatriculation, malus et frais à prévoir.</p>
+
+<div class="card"><h2>1. Origine et achat</h2>
+<label for="orig">Où achetez-vous le véhicule ?</label>
+<select id="orig">
+<option value="ue">Pays de l'Union européenne</option>
+<option value="tiers">Hors UE – sans accord (plein tarif)</option>
+<option value="us">États-Unis (droit de douane 0 % si origine US)</option>
+<option value="pref">Hors UE – avec accord préférentiel (choisir le pays)</option>
+</select>
+<div class="hint" id="origHint"></div>
+<div id="prefBox" class="hide"><label for="prefPays">Pays ayant un accord commercial avec l'UE</label>
+<select id="prefPays">
+<option value="">— Choisir un pays —</option>
+<optgroup label="Taux 0 % si origine prouvée (à confirmer dans TARIC)">
+<option value="0">Royaume-Uni</option>
+<option value="0">Suisse</option>
+<option value="0">Liechtenstein</option>
+<option value="0">Norvège</option>
+<option value="0">Islande</option>
+<option value="0">Turquie</option>
+<option value="0">Corée du Sud</option>
+<option value="0">Canada</option>
+<option value="0">Japon (suppression progressive des droits sur les voitures, à confirmer)</option>
+</optgroup>
+<optgroup label="Autres pays avec accord : taux à vérifier (TARIC) puis à saisir">
+<option value="">Albanie</option><option value="">Algérie</option><option value="">Bosnie-Herzégovine</option><option value="">Chili</option><option value="">Colombie</option><option value="">Équateur</option><option value="">Égypte</option><option value="">Géorgie</option><option value="">Israël</option><option value="">Jordanie</option><option value="">Kosovo</option><option value="">Liban</option><option value="">Macédoine du Nord</option><option value="">Maroc</option><option value="">Mexique</option><option value="">Moldavie</option><option value="">Monténégro</option><option value="">Nouvelle-Zélande</option><option value="">Pérou</option><option value="">Serbie</option><option value="">Singapour</option><option value="">Tunisie</option><option value="">Ukraine</option><option value="">Vietnam</option>
+</optgroup>
+</select>
+<div class="hint">Le taux dépend du véhicule et de la preuve d'origine (EUR.1, déclaration d'origine). Vérifiez-le dans la base TARIC (taxation-customs.ec.europa.eu) ou auprès de la douane.</div>
+<label for="prefTaux">Taux de droit de douane préférentiel (%)</label>
+<input type="number" id="prefTaux" min="0" max="30" step="0.1" value="0">
+<div class="hint">Selon l'accord et le certificat d'origine (EUR.1…) : à vérifier auprès de la douane.</div></div>
+<div class="row2">
+<div><label for="prixDev">Prix d'achat</label><div class="row2"><input type="number" id="prixDev" min="0" step="100" value="15000"><select id="devise"></select></div>
+<label for="taux" style="margin-top:8px">Cours : 1 € =</label><input type="number" id="taux" min="0" step="any" value="1">
+<small id="tauxHint" class="hint"></small>
+<label for="prix" style="margin-top:8px">Prix d'achat converti (€)</label><input type="number" id="prix" value="15000" readonly></div>
+<div id="transFrontBox"><label for="fretZone">Pays de provenance (prix moyen du transport constaté, prérempli)</label>
+<select id="fretZone">
+<optgroup label="Amérique du Nord">
+<option value="usa">États-Unis</option>
+<option value="can">Canada</option>
+</optgroup>
+<optgroup label="Asie">
+<option value="jp">Japon</option>
+<option value="cn">Chine</option>
+<option value="kr">Corée du Sud</option>
+<option value="sg">Singapour</option>
+<option value="vn">Vietnam</option>
+<option value="asie">Autre pays d'Asie (Thaïlande, Inde, Malaisie…)</option>
+</optgroup>
+<optgroup label="Moyen-Orient">
+<option value="eau">Émirats arabes unis (Dubaï)</option>
+</optgroup>
+<optgroup label="Europe hors UE (transport routier ou ferry)">
+<option value="uk">Royaume-Uni</option>
+</optgroup>
+<optgroup label="Autres">
+<option value="autre">Autre pays (saisir votre devis)</option>
+</optgroup>
+</select>
+<label for="transFront">Transport en conteneur + assurance jusqu'au port d'arrivée (€)</label><input type="number" id="transFront" min="0" step="50" value="0">
+<details class="fretDet"><summary>Voir le détail du prix moyen et les sources</summary><div class="hint" id="fretHint"></div></details></div>
+</div>
+
+<div class="row2"><div><label for="lieuDep">Lieu de départ</label><div class="sgw"><input type="text" id="lieuDep" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" placeholder="Adresse complète, ville ou port" autocomplete="off"><div class="sug hide" id="sugDep"></div></div></div>
+<div><label for="lieuArr">Lieu d'arrivée</label><div class="sgw"><input type="text" id="lieuArr" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" placeholder="Adresse complète, ville" autocomplete="off"><div class="sug hide" id="sugArr"></div></div></div></div>
+<div class="row2"><div><label for="kmConv">Distance estimée (km)</label><input type="number" id="kmConv" min="0" step="10" value="0"></div>
+<div><label>Tarif appliqué</label><div class="hint" style="margin:10px 0 0">1,30 € par kilomètre</div></div></div>
+<label for="convoy">Tarif convoyage</label>
+<input type="number" id="convoy" min="0" step="50" value="0">
+<div class="hint"><a id="gmaps" href="https://www.google.com/maps/dir/" target="_blank" rel="noopener">Vérifier le trajet sur Google Maps ↗</a> (ouvre l'itinéraire dans un nouvel onglet ; reportez les kilomètres affichés dans « Distance estimée »)</div>
+<div class="hint" id="convHint">Saisissez un départ et une arrivée (adresse complète : numéro, rue, code postal, ville ; ou simplement une ville ou un port) : la distance routière réelle est calculée automatiquement, puis multipliée par 1,30 €. Vous pouvez corriger les kilomètres ou le montant.</div>
+</div>
+
+<div class="card"><h2>2. Le véhicule</h2>
+<label for="vtype">Type de véhicule</label>
+<select id="vtype">
+<option value="vp">Voiture (véhicule de tourisme)</option>
+<option value="camping">Camping-car (caravane automotrice)</option>
+<option value="utl">Camionnette / pick-up</option>
+<option value="moto250">Moto ≤ 250 cm³</option>
+<option value="moto250p">Moto &gt; 250 cm³</option>
+</select>
+<div class="row2">
+<div><label for="dmc">1re mise en circulation (rubrique B)</label><input type="date" id="dmc"></div>
+<div><label for="km">Kilométrage (km)</label><input type="number" id="km" min="0" step="1000" value="60000"></div>
+</div>
+<div class="hint" id="ageHint"></div>
+<div class="row2">
+<div><label for="cv">Puissance fiscale (CV, P.6)</label><input type="number" id="cv" min="1" max="100" value="5"></div>
+<div><label for="mas">Masse en ordre de marche (kg, G)</label><input type="number" id="mas" min="0" max="5000" value="1400"></div>
+</div>
+<label for="ener">Énergie (rubrique P.3)</label>
+<select id="ener">
+<option value="ES">Essence (ES)</option>
+<option value="GO">Gazole (GO)</option>
+<option value="BL">Biogazole B100 (BL)</option>
+<option value="el">Électricité (EL), Hydrogène (H2, HE, HH)</option>
+<option value="EH">Essence/électricité – hybride non rechargeable (EH)</option>
+<option value="EE">Essence/électricité – hybride rechargeable (EE)</option>
+<option value="GH">Gazole/électricité – hybride non rechargeable (GH)</option>
+<option value="GL">Gazole/électricité – hybride rechargeable (GL)</option>
+<option value="GP">GPL (GP)</option>
+<option value="EG">Essence-GPL (EG), Essence-gaz naturel (EN)</option>
+<option value="G2">Gazole-GPL (G2), Gazole-gaz naturel (GF)</option>
+<option value="GN">Gaz naturel (GN)</option>
+<option value="E85">Superéthanol E85 (FE, FG, FN)</option>
+<option value="E85H">E85 hybride (FH, FL, FR…)</option>
+<option value="AC">Air comprimé (AC)</option>
+<option value="GA">Gazogène (GA)</option>
+</select>
+<div id="malusBox">
+<label for="recep">Réception du véhicule</label>
+<select id="recep">
+<option value="ue">Réception européenne (taux de CO₂ connu, rubrique V.7)</option>
+<option value="non">Sans réception UE (ex. : États-Unis, Japon) : malus selon la puissance fiscale</option>
+</select>
+<div id="co2Box"><div class="row2">
+<div><label for="co2">CO₂ en g/km (V.7)</label><input type="number" id="co2" min="0" max="400" value="120"></div>
+<div><label for="norme">Norme de mesure</label><select id="norme"><option value="WLTP">WLTP (récent)</option><option value="NEDC">NEDC (ancien)</option></select></div>
+</div></div>
+<label class="chk"><input type="checkbox" id="phev"> Hybride rechargeable avec plus de 50 km d'autonomie électrique en ville</label>
+<label class="chk"><input type="checkbox" id="handi"> Véhicule accessible en fauteuil roulant ou carte mobilité inclusion « invalidité »</label>
+</div>
+</div>
+
+<div class="card"><h2>3. Votre région</h2>
+<label for="reg">Région de résidence (tarif de la taxe régionale)</label>
+<select id="reg"></select></div>
+
+<div class="card"><h2>4. Frais à saisir</h2>
+<div class="hint">Ces postes n'ont pas de tarif officiel national : saisissez vos devis. Laissés à 0, ils ne sont pas comptés.</div>
+<label for="tvaMontant">TVA (€)</label><input type="number" id="tvaMontant" value="0" readonly>
+<div class="hint" id="tvaHint"></div>
+<div id="douaneBox"><label for="fraisDouane">Frais de dédouanement / transitaire (€)</label><input type="number" id="fraisDouane" min="0" step="10" value="450"><details class="fretDet"><summary>Voir le détail des frais et la source</summary><div class="hint" id="douaneHint"></div></details></div>
+<label for="conf">Conformité du véhicule (obligatoire)</label>
+<select id="conf">
+<option value="coc">Certificat de conformité européen (COC) du constructeur</option>
+<option value="homop">Homologation partielle auprès de la DREAL</option>
+<option value="homoc">Homologation complète auprès de la DREAL</option>
+</select>
+<label for="confCost">Coût du COC ou de l'homologation (essais, modifications, honoraires) (€)</label>
+<input type="number" id="confCost" min="0" step="50" value="300">
+<div id="ctBox"><label for="ctCost">Contrôle technique français (€)</label><input type="number" id="ctCost" min="0" step="5" value="81"><div class="hint">Prix moyen constaté prérempli : 81 €, moyenne de 10 catégories de véhicules (essence/diesel 80 €, hybride/électrique 87 €, gaz 95 €, 4x4 85 €, camionnette 84 €, camping-car 86 €, collection 81 €, voiturette 75 €, moto 71 €, cyclomoteur 67 €). Source : cteasy.com, d'après les tarifs déclarés à la DGCCRF. Les centres fixent librement leur prix (70 à 89 € pour 8 centres sur 10).</div></div>
+<label for="cpiCost">CPI (certificat provisoire d'immatriculation) (€)</label><input type="number" id="cpiCost" min="0" step="1" value="120">
+<div class="row2">
+<div><label for="plaqueType">Plaque provisoire</label><select id="plaqueType"><option value="fr">Plaque française (WW / plaque rose)</option><option value="etr">Plaque étrangère (pays d'achat)</option></select>
+<label for="plaques" style="margin-top:8px">Coût de la plaque provisoire (€)</label><input type="number" id="plaques" min="0" step="1" value="40"></div>
+<div><label for="mandat">Mandataire / frais de dossier (€)</label><input type="number" id="mandat" min="0" step="5" value="1800"></div>
+</div>
+</div>
+
+<div class="card res"><h2>Coût complet de l'import</h2>
+<p class="tot" id="tot">–</p>
+<p class="totsub" id="totsub"></p>
+<div id="alerts"></div>
+<table id="tab"></table>
+<p class="note">Estimation indicative. Les lignes en gris sont des estimations (barème 2026 appliqué à un import, ou montants non vérifiés). Vérifiez le montant exact sur <b>service-public.gouv.fr</b> (simulateur du coût du certificat d'immatriculation), auprès de la <b>douane</b> et de l'<b>ANTS</b> avant tout achat.</p></div>
+
+<div class="card"><h2>Formalités et obligations</h2>
+<ul class="chkl" id="chkl"></ul></div>
+
+<div class="card"><h2>Sources officielles</h2>
+<ul class="chkl">
+<li><a href="https://www.douane.gouv.fr/fiche/achat-dun-vehicule-letranger-ou-dans-un-dom-com" target="_blank" rel="noopener">Douane – achat d'un véhicule à l'étranger</a> (droits de douane, TVA, certificat 846 A, assurance frontière)</li>
+<li><a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F2991" target="_blank" rel="noopener">Service-Public – achat d'un véhicule dans l'UE</a> (TVA, quitus fiscal)</li>
+<li><a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F20992" target="_blank" rel="noopener">Service-Public – immatriculer un véhicule acheté à l'étranger</a> (COC, réception à titre isolé)</li>
+<li><a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F12097" target="_blank" rel="noopener">Service-Public – retour d'expatriation avec son véhicule</a> (contrôle technique, pièces)</li>
+<li><a href="https://www.impots.gouv.fr/obtenir-un-quitus-fiscal" target="_blank" rel="noopener">impots.gouv.fr – obtenir un quitus fiscal</a></li>
+<li><a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F35947" target="_blank" rel="noopener">Service-Public – malus CO₂</a> et <a href="https://www.service-public.gouv.fr/simulateur/calcul/cout-certificat-immatriculation" target="_blank" rel="noopener">simulateur officiel du coût du certificat d'immatriculation</a></li>
+<li><a href="https://eur-lex.europa.eu/legal-content/FR/TXT/PDF/?uri=OJ%3AL_202601455" target="_blank" rel="noopener">Règlement (UE) 2026/1455</a> (droit de douane à 0 % pour les véhicules d'origine américaine)</li>
+</ul></div>
+</main>
+<script>
+
+// Tarif du cheval fiscal par région (€) – à vérifier / mettre à jour chaque année
+var REG=[["Auvergne-Rhône-Alpes",43],["Bourgogne-Franche-Comté",60],["Bretagne",60],["Centre-Val de Loire",60],["Corse",53],["Grand Est",60],["Hauts-de-France",43],["Île-de-France",68.95],["Normandie",60],["Nouvelle-Aquitaine",58],["Occitanie",59.5],["Pays de la Loire",51],["Provence-Alpes-Côte d'Azur",60],["Guadeloupe",41],["Martinique",53],["Guyane",42.5],["La Réunion",60],["Mayotte",30]];
+var Y4=11,Y5=2.76,Y2=34;
+// Malus CO2 2026 (art. L421-62 CIBS), de 108 à 191 g/km ; 80 000 € au-delà
+var GRID=[50,75,100,125,150,170,190,210,230,240,260,280,310,330,360,400,450,540,650,740,818,898,983,1074,1172,1276,1386,1504,1629,1761,1901,2049,2205,2370,2544,2726,2918,3119,3331,3552,3784,4026,4279,4543,4818,5105,5404,5715,6126,6537,7248,7959,8770,9681,10692,11803,13014,14325,15736,17247,18858,20569,22380,24291,26302,28413,30624,32935,35346,37857,40468,43179,45990,48901,51912,55023,58134,61245,64356,67467,70578,73689,76800,79911];
+// Barèmes malus CO2 par année de 1re immatriculation (S: courbe WLTP 2020-2023, T: courbe NEDC 2017-2019, G19: grille 2019)
+var S=[50,75,100,125,150,170,190,210,230,240,260,280,310,330,360,400,450,540,650,740,818,898,983,1074,1172,1276,1386,1504,1629,1761,1901,2049,2205,2370,2544,2726,2918,3119,3331,3552,3784,4026,4279,4543,4818,5105,5404,5715,6039,6375,6724,7086,7462,7851,8254,8671,9103,9550,10011,10488,10980,11488,12012,12552,13109,13682,14273,14881,15506,16149,16810,17490,18188,18905,19641,20396,21171,21966,22781,23616,24472,25349,26247,27166,28107,29070,30056,31063,32094,33147,34224,35324,36447,37595,38767,39964,41185,42431,43703,45000,46323,47672,49047];
+var T=[50,53,60,73,90,113,140,173,210,253,300,353,410,473,540,613,690,773,860,953,1050,1153,1260,1373,1490,1613,1740,1873,2010,2153,2300,2453,2610,2773,2940,3113,3290,3473,3660,3853,4050,4253,4460,4673,4890,5113,5340,5573,5810,6053,6300,6553,6810,7073,7340,7613,7890,8173,8460,8753,9050,9353,9660,9973];
+var G19=[35,40,45,50,55,60,65,70,75,80,85,90,113,140,173,210,253,300,353,410,473,540,613,690,773,860,953,1050,1101,1153,1260,1373,1490,1613,1740,1873,2010,2153,2300,2453,2610,2773,2940,3113,3290,3473,3660,3756,3853,4050,4253,4460,4673,4890,5113,5340,5573,5810,6053,6300,6553,6810,7073,7340,7613,7890,8173,8460,8753,9050,9353,9660,9973,10290];
+function seq(a,t0,cap,g){if(g<t0)return 0;var k=g-t0;return k>=a.length?cap:Math.min(a[k],cap);}
+function malusAn(v,g,norme){
+ var d=v||"2026-06-01",y=+d.slice(0,4);
+ if(y<2015)return [0,"avant 2015 : aucun malus"];
+ if(y<=2016){var m=g<131?0:g<=135?150:g<=140?250:g<=145?500:g<=150?900:g<=155?1600:g<=175?2200:g<=180?3000:g<=185?3600:g<=190?4000:g<=200?6500:8000;return [m,"barème "+y+(y===2015?" (assimilé à 2016)":"")+", NEDC"];}
+ if(y===2017)return [seq(T,127,10000,g),"barème 2017, NEDC"];
+ if(y===2018)return [seq(T.concat([10290]),120,10500,g),"barème 2018, NEDC"];
+ if(y===2019)return [seq(G19,117,10500,g),"barème 2019, NEDC"];
+ var ned=(norme==="NEDC")||(y===2020&&d<"2020-03-01");
+ if(ned)return [seq(S,110,20000,g),"barème NEDC (dès 110 g, plafond 20 000 €)"];
+ if(y===2020)return [seq(S,138,20000,g),"barème 2020 WLTP"];
+ if(y===2021)return [seq(S,133,30000,g),"barème 2021 WLTP"];
+ if(y===2022)return [seq(S,128,40000,g),"barème 2022 WLTP"];
+ if(y===2023)return [seq(S,123,50000,g),"barème 2023 WLTP"];
+ if(d<"2025-03-01")return [g<118?0:g>193?60000:GRID[g-118],"barème 2024 – fév. 2025 WLTP"];
+ if(y===2025)return [g<113?0:g>192?70000:GRID[g-113],"barème mars–déc. 2025 WLTP"];
+ return [g<108?0:g>191?80000:GRID[g-108],"barème 2026 WLTP"];
+}
+if(typeof window!=="undefined")window.onerror=function(m,u,l){try{var e=document.getElementById("boot");if(e){e.style.display="block";e.textContent="Erreur d'affichage : "+m+" (ligne "+l+")"}}catch(x){}};
+var CVT=[0,0,0,500,2000,4750,7500,10250,15250,21250,29000,36000,44000,52750,62500,80000]; // malus 2026 sans réception UE, par CV (Service-Public F35947)
+var DECOTE=[[0,0],[3,3],[6,6],[9,9],[12,12],[18,16],[24,20],[36,28],[48,33],[60,38],[72,43],[84,48],[96,53],[108,58],[120,64],[132,70],[144,76],[156,82],[168,88],[180,94]];
+function decote(mois,yr){if(yr<2015)return 100;for(var j=0;j<DECOTE.length;j++){if(mois<=DECOTE[j][0])return DECOTE[j][1];}return 100;}
+function monthsSince(v,now){if(!v)return 0;var d=new Date(v),m=(now.getFullYear()-d.getFullYear())*12+now.getMonth()-d.getMonth();if(now.getDate()<d.getDate())m--;return Math.max(0,m);}
+function monthsStarted(v,now){if(!v)return 0;var d=new Date(v),m=monthsSince(v,now),r=(now.getDate()!==d.getDate());return m+(r?1:0);}
+function yearsSince(v,now){if(!v)return 0;var d=new Date(v),a=now.getFullYear()-d.getFullYear();if(now.getMonth()<d.getMonth()||(now.getMonth()===d.getMonth()&&now.getDate()<d.getDate()))a--;return Math.max(0,a);}
+function massMalus(m,ab,yr){var s,TR;if(yr<=2023){s=1800;TR=[[1e9,10]];}else if(yr<=2025){s=1600;TR=[[200,10],[100,15],[100,20],[100,25],[1e9,30]];}else{s=1500;TR=[[200,10],[100,15],[100,20],[100,25],[1e9,30]];}var r=Math.max(0,m-ab-(s-1)),mm=0;for(var k=0;k<TR.length&&r>0;k++){var q=Math.min(r,TR[k][0]);mm+=q*TR[k][1];r-=q;}return mm;}
+// i : saisies ; now : date du jour. Retourne {groups,total,hors,alerts,list}
+function compute(i,now){
+ var G=[],al=[],ls=[];
+ function grp(t){var g={t:t,l:[]};G.push(g);return g;}
+ function add(g,t,v,est,info){g.l.push({t:t,v:v,e:!!est||!!info,i:!!info});}
+ var ue=i.orig==="ue",moto=(i.vtype==="moto250"||i.vtype==="moto250p"),vt=(i.vtype==="vp"||i.vtype==="camping");
+ var mois=monthsSince(i.dmc,now),age=yearsSince(i.dmc,now),yr=i.dmc?+i.dmc.slice(0,4):now.getFullYear();
+ // 1. Achat
+ var g1=grp("Achat et transport");
+ add(g1,"Prix d'achat du véhicule",i.prix);
+ if(!ue&&i.transFront>0)add(g1,"Transport en conteneur et assurance jusqu'au port d'arrivée",i.transFront);
+  if(i.convoy>0)add(g1,ue?"Convoyage":"Convoyage jusqu'à chez vous",i.convoy);
+ // 2. Taxes d'import
+ var g2=grp("Taxes à l'import");
+ var neufFisc=(mois<6||i.km<6000);
+ if(ue){
+  if(neufFisc){add(g2,"TVA française 20 % (véhicule neuf fiscalement : moins de 6 mois ou moins de 6 000 km), sur le prix HT",Math.round(i.prix*0.20*100)/100);al.push("Ce véhicule a moins de 6 mois ou moins de 6 000 km : il est considéré comme neuf par le fisc. La TVA française de 20 % est due (le prix d'achat est supposé hors taxes). Un véhicule d'occasion au sens fiscal a plus de 6 mois et plus de 6 000 km.");}
+  else add(g2,"Droits de douane et TVA française : aucun (véhicule d'occasion acheté dans l'UE)",0);
+ } else {
+  var rate={vp:10,camping:10,utl:22,moto250:8,moto250p:6}[i.vtype],note="";
+  if(i.orig==="us"){rate=0;note=" (États-Unis, règlement UE 2026/1455, du 1/07/2026 au 31/12/2029, origine américaine requise)";}
+  else if(i.orig==="pref"){rate=i.prefTaux;note=" (taux préférentiel saisi)";}
+  else if(i.vtype==="utl")note=" (jusqu'à 22 % selon cylindrée et poids : à vérifier)";
+  var vd=i.prix+i.transFront,dd=Math.round(vd*rate)/100,tva=Math.round((vd+dd)*0.20*100)/100;
+  add(g2,"Base de calcul : valeur en douane (prix + transport/assurance jusqu'à l'UE), non comptée dans le total",vd,false,true);
+  add(g2,"Droits de douane "+String(rate).replace(".",",")+" %"+note,dd,i.vtype==="utl"&&i.orig==="tiers");
+  add(g2,"TVA à l'importation 20 % (valeur en douane + droits)",tva);
+  if(i.fraisDouane>0)add(g2,"Frais de dédouanement / transitaire",i.fraisDouane);
+  al.push("TVA à l'importation : selon la douane, la base de la TVA comprend aussi les frais de transport jusqu'au premier lieu de destination dans l'UE (par exemple le convoyage depuis le port) lorsqu'ils sont connus au dépôt de la déclaration. Ces frais ne sont pas ajoutés à la base dans ce calcul : le montant de TVA affiché peut donc être légèrement inférieur au montant réel.");
+ }
+ // 3. Conformité
+ var g3=grp("Conformité et contrôle");
+ if(i.confCost>0)add(g3,i.conf==="coc"?"Certificat de conformité européen (COC)":(i.conf==="homop"?"Homologation partielle (DREAL)":"Homologation complète (DREAL)"),i.confCost);
+ if(age>=4&&i.ctCost>0)add(g3,"Contrôle technique français (véhicule de plus de 4 ans)",i.ctCost);
+ if(i.cpiCost>0)add(g3,"CPI (certificat provisoire d'immatriculation)",i.cpiCost);
+ if(i.plaques>0)add(g3,i.plaqueType==="etr"?"Plaque provisoire étrangère (pays d'achat)":"Plaque provisoire française (WW)",i.plaques);
+ if(g3.l.length===0)G.pop();
+ // 4. Carte grise
+ var g4=grp("Certificat d'immatriculation (carte grise)");
+ var reg=REG[i.reg],cv=Math.max(1,i.cv||1),y1=cv*reg[1],t1="Taxe régionale Y1 ("+cv+" CV × "+String(reg[1]).replace(".",",")+" €)";
+ if(monthsStarted(i.dmc,now)>120){y1/=2;t1+=" – 50 % (véhicule de plus de 10 ans)";}
+ if(i.ener==="el"&&reg[0]==="Hauts-de-France"){y1/=2;t1+=" – 50 % (électrique)";}
+ add(g4,t1,y1);
+ if(i.vtype==="utl")add(g4,"Taxe véhicule de transport Y2 (à vérifier)",Y2,true);
+ if(vt&&i.ener!=="el"&&!i.handi){
+  var dec=decote(monthsStarted(i.dmc,now),yr),mc=0,lbl;
+  if(i.recep==="ue"){var g=+i.co2||0,e=i.ener;if((e==="E85"||e==="E85H")&&g<=250)g=Math.round(g*0.6);var mb=malusAn(i.dmc,g,i.norme);mc=mb[0]*(1-dec/100);lbl="Malus CO₂ ("+g+" g/km, "+mb[1]+", décote "+Math.round(dec)+" %)";}
+  else{mc=CVT[Math.min(15,cv)]*(1-dec/100);lbl="Malus selon la puissance fiscale ("+cv+" CV, barème 2026, décote "+Math.round(dec)+" %) – estimation";al.push("Véhicule sans réception UE : le malus dépend de la puissance fiscale ; le barème de l'année de première immatriculation n'est pas intégré, le montant affiché est une estimation.");}
+  add(g4,lbl,mc,i.recep!=="ue"||i.vtype==="camping");
+  var ab=0;if(i.ener==="EH"||i.ener==="GH")ab=100;if(i.ener==="EE"||i.ener==="GL")ab=i.phev?Math.min(200,i.mas*0.15):100;
+  var mm=yr<2022?0:massMalus(i.mas,ab,yr);if(mc+mm*(1-dec/100)>80000)mm=Math.max(0,(80000-mc)/(1-dec/100));
+  add(g4,"Taxe sur la masse ("+i.mas+" kg, barème "+(yr<2022?2022:Math.min(yr,2026))+", décote "+Math.round(dec)+" %)",mm*(1-dec/100),i.recep!=="ue");
+ } else if(vt){add(g4,"Malus CO₂ et taxe sur la masse (exonération : électrique/hydrogène ou accessibilité)",0);}
+ add(g4,"Taxe fixe Y4",Y4);add(g4,"Redevance d'acheminement Y5",Y5);
+ if(i.mandat>0){var g5=grp("Autres frais");add(g5,"Mandataire / frais de dossier",i.mandat);}
+ var total=0;G.forEach(function(g){g.l.forEach(function(l){if(!l.i)total+=l.v;});});
+ total=Math.round(total*100)/100;
+ if(i.transFront+i.convoy+i.confCost+(ue?0:i.fraisDouane)+i.ctCost+i.cpiCost===0)al.push("Aucun frais de transport, de conformité ou de dédouanement n'est saisi : le total est donc incomplet. Saisissez vos devis dans les sections 1 et 4.");
+ // Formalités
+ if(ue){ls.push("Quitus fiscal (gratuit) : à demander après la livraison, en ligne (impots.gouv.fr) ; il est exigé pour immatriculer un véhicule acheté dans l'UE. Pièce utile : facture montrant la TVA payée dans le pays d'achat (professionnel) ou justificatif de vente (particulier).");}
+ else{ls.push("Dédouanement : déclaration en douane, paiement des droits et de la TVA, puis remise du certificat de dédouanement 846 A, à joindre à la demande de carte grise (paiement en euros ; au-delà de 1 524,49 €, chèque certifié ou de banque).");
+  ls.push("Plaques étrangères valides obligatoires à l'entrée (les plaques expirées ne sont pas acceptées) ; sans attestation d'assurance valable, une assurance frontière de 30 ou 90 jours se souscrit en douane.");
+  if(i.orig==="pref"||i.orig==="us")ls.push("Taux réduit ou nul : justificatif d'origine à présenter (certificat EUR.1 ou équivalent selon l'accord).");
+  if(i.orig==="us")ls.push("Le droit à 0 % pour les véhicules d'origine américaine s'applique du 1er juillet 2026 au 31 décembre 2029 ; la Commission peut suspendre le dispositif. Un véhicule non fabriqué aux États-Unis n'en bénéficie pas.");}
+ ls.push(i.conf==="coc"?"Certificat de conformité européen (COC) du constructeur (numérique accepté), ou certificat d'identification du véhicule, à fournir pour l'immatriculation.":(i.conf==="homop"?"Homologation partielle":"Homologation complète")+" (réception à titre isolé) : rapport délivré par la DREAL de votre région, requis si vous n'avez pas de COC (cas fréquent hors UE). Le périmètre exact de la procédure est à confirmer auprès de la DREAL.");
+ ls.push(age>=4?"Contrôle technique français de moins de 6 mois : obligatoire (véhicule de plus de 4 ans).":"Contrôle technique : non exigé tant que le véhicule a moins de 4 ans.");
+ ls.push("Demande de carte grise sur le site de l'ANTS (ou par un professionnel habilité) : certificat d'immatriculation étranger, justificatif de domicile de moins de 6 mois, pièce d'identité, déclaration d'assurance et de permis (cerfa n° 13750).");
+ ls.push("Circulation avant l'immatriculation : certificat provisoire WW ou plaques valides du pays d'achat, selon les cas.");
+ return {groups:G,total:total,hors:Math.round((total-i.prix)*100)/100,alerts:al,list:ls};
+}
+// ---------- Interface ----------
+var $=function(id){return document.getElementById(id)};
+function eur(n){return n.toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2})+" €"}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+var NS=" Sources commerciales indicatives, non officielles.";
+var FRET={usa:[2000,"États-Unis : conteneur partagé 1 025 à 1 800 $, conteneur complet 1 905 à 3 020 $ par voiture, frais d'arrivée dès 600 $, total courant 2 000 à 4 000 $ (cfrclassic.com, wcshipping.com)."],
+can:[2400,"Canada : environ 2 190 à 3 590 $ par voiture selon le port de départ (brlogistics.net, page peu cohérente sur les montants)."],
+jp:[2800,"Japon : conteneur 2 000 à 3 500 $ par voiture plus 300 à 600 $ de frais d'arrivée ; transport roulier seul 1 100 à 1 500 $ (blog.japanesecartrade.com, mai 2026)."],
+cn:[2100,"Chine : environ 1 850 à 2 850 $ par voiture, conteneur 2 850 $ depuis Shanghai, Canton ou Shenzhen (brlogistics.net, page peu cohérente sur les montants)."],
+kr:[2800,"Corée du Sud : aucune source trouvée ; montant par défaut repris du Japon (estimation)."],
+sg:[2800,"Singapour : aucune source trouvée ; montant par défaut repris du Japon (estimation)."],
+vn:[2800,"Vietnam : aucune source trouvée ; montant par défaut repris du Japon (estimation)."],
+asie:[2800,"Autres pays d'Asie : aucune source trouvée ; montant par défaut repris du Japon (estimation)."],
+eau:[3500,"Émirats arabes unis : conteneur 3 000 à 4 000 €, transport roulier 1 500 à 2 500 €, frais portuaires inclus (demenageur.com). Le certificat d'export à Dubaï (300 à 500 €) s'ajoute côté départ."],
+uk:[750,"Royaume-Uni : environ 750 € vers la France (brlogistics.net)."],
+autre:[0,"Aucun prix moyen prérempli pour ce pays : saisissez votre devis."]};
+var BASE_DOUANE="transitaire 450 € (courtage en douane et déclaration DAU 200 €, manutention portuaire 150 €, suivi administratif 100 € ; milieu des fourchettes 300 à 600 € de dreal-homologation.fr)";
+var DOUANE={usa:[525,BASE_DOUANE+", plus traduction assermentée du titre de propriété américain 75 € (50 à 100 €)"],
+can:[450,BASE_DOUANE+". Aucun surcoût propre au Canada n'a été trouvé"],
+jp:[390,"frais d'un agent et de dédouanement au port français : 300 à 600 $ par véhicule, soit environ 390 € au milieu de la fourchette (blog.japanesecartrade.com, mai 2026)"],
+cn:[450,BASE_DOUANE+". Aucune source propre à la Chine : montant par défaut"],
+kr:[450,BASE_DOUANE+". Aucune source propre à la Corée du Sud : montant par défaut"],
+sg:[450,BASE_DOUANE+". Aucune source propre à Singapour : montant par défaut"],
+vn:[450,BASE_DOUANE+". Aucune source propre au Vietnam : montant par défaut"],
+asie:[450,BASE_DOUANE+". Aucune source propre à ces pays : montant par défaut"],
+eau:[850,BASE_DOUANE+", plus certificat d'export à Dubaï 400 € (300 à 500 €, frais côté départ ; demenageur.com)"],
+uk:[450,BASE_DOUANE+". Aucune source propre au Royaume-Uni : montant par défaut"],
+autre:[450,BASE_DOUANE+". Aucune source propre à ce pays : montant par défaut"]};
+function applyFret(){var z=FRET[$("fretZone").value]?$("fretZone").value:"usa",ue=$("orig").value==="ue";$("transFront").value=ue?0:FRET[z][0];$("fraisDouane").value=ue?0:DOUANE[z][0];$("douaneHint").textContent="Prix moyen constaté prérempli : "+DOUANE[z][0].toLocaleString("fr-FR")+" € = "+DOUANE[z][1]+". Tarifs de transitaires indicatifs, non officiels, libres selon le prestataire. Les droits de douane et la TVA sont calculés à part dans « Taxes à l'import ». Remplacez par votre devis.";$("fretHint").textContent=(FRET[z][0]?"Prix moyen constaté prérempli : "+FRET[z][0].toLocaleString("fr-FR")+" €. ":"")+FRET[z][1]+NS+" Montants en dollars convertis approximativement. Ce montant est inclus dans la valeur en douane (hors UE). Remplacez-le par votre devis."}
+var LIEUX={"Le Havre": [49.49, 0.11], "Marseille-Fos": [43.4, 4.9], "Dunkerque": [51.03, 2.37], "Nantes-Saint-Nazaire": [47.27, -2.2], "Bordeaux (port)": [44.87, -0.56], "Sète": [43.4, 3.7], "Anvers (Belgique)": [51.26, 4.4], "Zeebrugge (Belgique)": [51.33, 3.2], "Rotterdam (Pays-Bas)": [51.95, 4.14], "Hambourg (Allemagne)": [53.54, 9.97], "Bremerhaven (Allemagne)": [53.55, 8.58], "Barcelone (Espagne)": [41.35, 2.17], "Valence (Espagne)": [39.44, -0.32], "Gênes (Italie)": [44.41, 8.93], "Munich": [48.14, 11.58], "Berlin": [52.52, 13.4], "Stuttgart": [48.78, 9.18], "Francfort": [50.11, 8.68], "Cologne": [50.94, 6.96], "Bruxelles": [50.85, 4.35], "Amsterdam": [52.37, 4.9], "Luxembourg": [49.61, 6.13], "Madrid": [40.42, -3.7], "Lisbonne": [38.72, -9.14], "Milan": [45.46, 9.19], "Turin": [45.07, 7.69], "Vienne (Autriche)": [48.21, 16.37], "Prague": [50.08, 14.44], "Varsovie": [52.23, 21.01], "Genève": [46.2, 6.14], "Londres": [51.51, -0.13], "Paris": [48.86, 2.35], "Lyon": [45.76, 4.84], "Marseille": [43.3, 5.37], "Toulouse": [43.6, 1.44], "Nice": [43.7, 7.27], "Nantes": [47.22, -1.55], "Montpellier": [43.61, 3.88], "Strasbourg": [48.57, 7.75], "Bordeaux": [44.84, -0.58], "Lille": [50.63, 3.06], "Rennes": [48.11, -1.68], "Reims": [49.26, 4.03], "Grenoble": [45.19, 5.72], "Dijon": [47.32, 5.04], "Angers": [47.47, -0.55], "Clermont-Ferrand": [45.78, 3.09], "Saint-Étienne": [45.44, 4.39], "Annecy": [45.9, 6.13], "Chambéry": [45.57, 5.92], "Valence (Drôme)": [44.93, 4.89], "Bourg-en-Bresse": [46.21, 5.23], "Villefranche-sur-Saône": [45.99, 4.72], "Vienne (Isère)": [45.52, 4.87], "Roanne": [46.04, 4.07], "Caen": [49.18, -0.37], "Rouen": [49.44, 1.1], "Tours": [47.39, 0.69], "Limoges": [45.83, 1.26], "Metz": [49.12, 6.18], "Besançon": [47.24, 6.02], "Perpignan": [42.7, 2.9], "Poitiers": [46.58, 0.34], "Brest": [48.39, -4.49], "Orléans": [47.9, 1.91], "Nîmes": [43.84, 4.36], "Avignon": [43.95, 4.81], "Toulon": [43.12, 5.93], "Le Mans": [48.0, 0.2], "Amiens": [49.89, 2.3], "Pau": [43.3, -0.37]};
+var TARIF_KM=1.30;
+var DIST_N=["Le Havre", "Marseille-Fos", "Dunkerque", "Nantes-Saint-Nazaire", "Bordeaux (port)", "Sète", "Anvers (Belgique)", "Zeebrugge (Belgique)", "Rotterdam (Pays-Bas)", "Hambourg (Allemagne)", "Bremerhaven (Allemagne)", "Barcelone (Espagne)", "Valence (Espagne)", "Gênes (Italie)", "Munich", "Berlin", "Stuttgart", "Francfort", "Cologne", "Bruxelles", "Amsterdam", "Luxembourg", "Madrid", "Lisbonne", "Milan", "Turin", "Vienne (Autriche)", "Prague", "Varsovie", "Genève", "Londres", "Paris", "Lyon", "Marseille", "Toulouse", "Nice", "Nantes", "Montpellier", "Strasbourg", "Bordeaux", "Lille", "Rennes", "Reims", "Grenoble", "Dijon", "Angers", "Clermont-Ferrand", "Saint-Étienne", "Annecy", "Chambéry", "Valence (Drôme)", "Bourg-en-Bresse", "Villefranche-sur-Saône", "Vienne (Isère)", "Roanne", "Caen", "Rouen", "Tours", "Limoges", "Metz", "Besançon", "Perpignan", "Poitiers", "Brest", "Orléans", "Nîmes", "Avignon", "Toulon", "Le Mans", "Amiens", "Pau"];
+var DIST_FR=["Paris", "Lyon", "Marseille", "Toulouse", "Nice", "Nantes", "Montpellier", "Strasbourg", "Bordeaux", "Lille", "Rennes", "Reims", "Grenoble", "Dijon", "Angers", "Clermont-Ferrand", "Saint-Étienne", "Annecy", "Chambéry", "Valence (Drôme)", "Bourg-en-Bresse", "Villefranche-sur-Saône", "Vienne (Isère)", "Roanne", "Caen", "Rouen", "Tours", "Limoges", "Metz", "Besançon", "Perpignan", "Poitiers", "Brest", "Orléans", "Nîmes", "Avignon", "Toulon", "Le Mans", "Amiens", "Pau"];
+var DIST_M=[[197, 656, 963, 846, 1122, 384, 918, 700, 652, 318, 277, 344, 766, 505, 295, 591, 721, 733, 761, 755, 619, 623, 684, 593, 94, 91, 307, 561, 539, 600, 1017, 409, 466, 302, 903, 879, 1029, 210, 181, 851], [765, 304, 54, 363, 231, 944, 124, 794, 604, 991, 1019, 788, 296, 494, 897, 457, 323, 413, 354, 204, 387, 334, 272, 397, 991, 888, 788, 647, 758, 556, 275, 848, 1242, 748, 79, 93, 120, 882, 917, 549], [296, 768, 1076, 973, 1234, 638, 1064, 630, 880, 78, 567, 274, 878, 578, 552, 718, 826, 830, 873, 867, 723, 736, 796, 699, 385, 253, 535, 689, 470, 657, 1145, 638, 757, 429, 1015, 992, 1142, 466, 199, 1080], [438, 740, 1049, 648, 1208, 64, 894, 921, 410, 659, 125, 573, 841, 694, 145, 588, 718, 835, 837, 838, 720, 717, 767, 619, 306, 440, 270, 383, 760, 789, 853, 283, 273, 389, 937, 962, 1115, 239, 561, 610], [580, 551, 649, 248, 808, 344, 494, 961, 5, 800, 455, 714, 652, 663, 393, 369, 528, 686, 647, 649, 624, 539, 577, 488, 599, 650, 344, 219, 907, 723, 452, 248, 641, 457, 537, 578, 715, 438, 715, 209], [766, 333, 197, 230, 356, 812, 42, 822, 471, 1019, 923, 817, 325, 523, 791, 350, 352, 442, 382, 232, 415, 362, 301, 425, 936, 871, 682, 514, 786, 584, 143, 716, 1109, 642, 85, 126, 263, 776, 901, 417], [353, 761, 1068, 1030, 1227, 735, 1057, 482, 937, 136, 703, 278, 870, 570, 650, 775, 818, 822, 866, 860, 715, 728, 789, 756, 521, 389, 592, 746, 322, 586, 1202, 695, 893, 486, 1007, 984, 1134, 563, 273, 1137], [305, 777, 1085, 982, 1244, 688, 1073, 554, 890, 88, 650, 284, 887, 587, 602, 728, 835, 839, 882, 877, 732, 745, 805, 709, 468, 336, 545, 698, 393, 666, 1154, 647, 840, 438, 1024, 1001, 1151, 515, 225, 1089], [469, 877, 1184, 1146, 1343, 851, 1173, 598, 1053, 252, 819, 394, 986, 686, 765, 891, 934, 938, 982, 976, 831, 844, 905, 872, 636, 504, 708, 861, 438, 702, 1318, 811, 1008, 602, 1123, 1100, 1250, 679, 389, 1253], [897, 1167, 1476, 1575, 1421, 1280, 1464, 691, 1482, 674, 1247, 776, 1193, 946, 1194, 1305, 1226, 1091, 1136, 1268, 1091, 1138, 1196, 1181, 1065, 933, 1137, 1290, 681, 926, 1615, 1239, 1437, 1031, 1415, 1392, 1542, 1107, 817, 1681], [844, 1083, 1390, 1521, 1449, 1226, 1378, 720, 1428, 620, 1194, 723, 1221, 892, 1140, 1217, 1140, 1120, 1164, 1182, 1119, 1050, 1111, 1093, 1011, 879, 1083, 1236, 627, 954, 1530, 1185, 1383, 977, 1329, 1306, 1456, 1054, 764, 1627], [1040, 644, 509, 401, 667, 982, 354, 1134, 642, 1261, 1094, 1128, 636, 834, 1032, 624, 663, 753, 694, 544, 727, 674, 613, 721, 1210, 1145, 956, 685, 1098, 896, 198, 887, 1280, 916, 396, 438, 575, 1050, 1175, 429], [1378, 982, 847, 635, 1005, 1126, 692, 1472, 779, 1599, 1237, 1466, 974, 1172, 1175, 963, 1001, 1091, 1032, 882, 1065, 1012, 951, 1059, 1381, 1432, 1127, 919, 1436, 1234, 537, 1030, 1423, 1254, 735, 776, 913, 1220, 1513, 544], [911, 466, 391, 756, 192, 1147, 518, 612, 997, 1120, 1215, 917, 398, 632, 1061, 632, 516, 397, 368, 492, 480, 505, 468, 565, 1137, 1034, 952, 877, 767, 509, 669, 932, 1437, 912, 473, 453, 343, 1046, 1090, 943], [832, 737, 1046, 1315, 804, 1203, 1034, 359, 1313, 901, 1170, 690, 731, 675, 1117, 973, 796, 630, 674, 835, 759, 806, 764, 849, 1071, 978, 1034, 1077, 505, 593, 1186, 1136, 1413, 928, 985, 962, 954, 1031, 863, 1460], [1052, 1232, 1541, 1713, 1345, 1434, 1529, 756, 1636, 851, 1402, 931, 1258, 1072, 1348, 1370, 1291, 1156, 1201, 1333, 1156, 1203, 1261, 1246, 1219, 1087, 1291, 1444, 787, 991, 1680, 1393, 1591, 1185, 1480, 1457, 1496, 1262, 972, 1836], [626, 629, 938, 1110, 840, 998, 926, 154, 1108, 655, 964, 484, 592, 469, 912, 768, 688, 491, 535, 730, 553, 601, 658, 643, 866, 773, 828, 871, 300, 388, 1078, 931, 1208, 722, 877, 854, 1004, 825, 657, 1302], [575, 692, 1001, 1173, 973, 946, 989, 217, 1153, 516, 913, 433, 719, 532, 860, 831, 751, 617, 662, 793, 617, 664, 722, 707, 814, 721, 808, 935, 248, 451, 1141, 910, 1156, 702, 940, 917, 1067, 774, 606, 1352], [486, 720, 1028, 1163, 1136, 868, 1016, 358, 1070, 320, 836, 365, 830, 530, 782, 855, 778, 780, 825, 820, 675, 688, 748, 731, 653, 521, 725, 878, 265, 614, 1168, 827, 1025, 619, 967, 944, 1094, 696, 406, 1270], [308, 713, 1020, 985, 1179, 690, 1008, 443, 892, 112, 657, 230, 822, 522, 604, 730, 770, 774, 818, 812, 667, 680, 740, 711, 475, 343, 547, 700, 283, 602, 1157, 649, 847, 441, 959, 936, 1086, 518, 227, 1091], [502, 910, 1217, 1179, 1376, 884, 1206, 630, 1086, 285, 852, 427, 1019, 719, 799, 924, 967, 1030, 1015, 1009, 864, 877, 938, 905, 669, 537, 741, 895, 471, 735, 1351, 844, 1042, 635, 1156, 1133, 1283, 712, 422, 1286], [359, 519, 826, 996, 985, 730, 814, 224, 937, 304, 696, 216, 628, 328, 644, 653, 576, 580, 624, 618, 473, 486, 546, 529, 598, 505, 591, 745, 63, 327, 966, 694, 940, 485, 765, 742, 892, 557, 389, 1136], [1269, 1224, 1088, 798, 1247, 1033, 933, 1647, 686, 1490, 1145, 1404, 1215, 1349, 1083, 1055, 1214, 1333, 1273, 1123, 1306, 1225, 1192, 1174, 1288, 1340, 1034, 908, 1597, 1409, 778, 938, 1331, 1147, 976, 1017, 1154, 1128, 1405, 610], [1736, 1703, 1658, 1264, 1817, 1500, 1503, 2113, 1153, 1956, 1611, 1870, 1785, 1815, 1549, 1521, 1680, 1838, 1799, 1693, 1776, 1691, 1762, 1640, 1755, 1806, 1501, 1375, 2063, 1875, 1404, 1404, 1797, 1613, 1546, 1587, 1724, 1594, 1871, 1076], [853, 442, 513, 879, 314, 1089, 640, 480, 998, 1022, 1157, 819, 374, 574, 1003, 608, 492, 339, 344, 468, 422, 482, 444, 541, 1080, 976, 895, 818, 635, 512, 791, 874, 1379, 855, 595, 575, 465, 988, 992, 1065], [775, 305, 370, 769, 280, 1003, 531, 595, 861, 1001, 1039, 799, 237, 504, 917, 471, 355, 254, 206, 331, 367, 344, 307, 403, 1002, 898, 808, 716, 768, 379, 682, 788, 1293, 777, 481, 458, 430, 902, 927, 956], [1241, 1149, 1337, 1718, 1138, 1612, 1446, 762, 1716, 1225, 1579, 1099, 1143, 1077, 1526, 1376, 1208, 1041, 1086, 1247, 1161, 1209, 1176, 1251, 1480, 1387, 1474, 1479, 914, 996, 1598, 1576, 1822, 1368, 1397, 1374, 1289, 1440, 1272, 1910], [1035, 1079, 1388, 1560, 1178, 1406, 1376, 604, 1558, 1019, 1373, 893, 1106, 919, 1320, 1218, 1138, 1004, 1049, 1180, 1004, 1051, 1109, 1094, 1274, 1181, 1268, 1322, 708, 838, 1528, 1370, 1616, 1161, 1327, 1304, 1329, 1234, 1065, 1752], [1590, 1770, 2079, 2251, 1828, 1972, 2067, 1294, 2174, 1389, 1940, 1469, 1796, 1610, 1886, 1909, 1829, 1694, 1739, 1871, 1694, 1741, 1799, 1784, 1757, 1625, 1829, 1982, 1326, 1529, 2218, 1932, 2129, 1723, 2018, 1995, 1979, 1800, 1510, 2374], [539, 149, 458, 685, 535, 775, 446, 392, 705, 748, 844, 546, 143, 260, 689, 315, 208, 41, 86, 246, 109, 165, 176, 248, 766, 662, 581, 504, 515, 176, 598, 560, 1065, 541, 397, 374, 524, 674, 719, 871], [621, 1080, 1388, 1195, 1546, 604, 1306, 796, 957, 284, 497, 440, 1190, 743, 632, 979, 1108, 1158, 1185, 1179, 1043, 1048, 1108, 1009, 386, 514, 644, 872, 635, 823, 1405, 746, 687, 694, 1327, 1304, 1454, 547, 329, 1156], [0, 467, 774, 678, 933, 383, 750, 493, 585, 220, 349, 144, 576, 316, 297, 423, 485, 544, 572, 566, 430, 434, 495, 404, 235, 132, 240, 393, 332, 411, 849, 342, 593, 133, 713, 690, 840, 210, 135, 784], [465, 0, 312, 539, 471, 683, 300, 488, 554, 691, 719, 488, 105, 194, 597, 164, 62, 139, 100, 104, 81, 34, 32, 97, 691, 588, 488, 409, 458, 250, 451, 468, 973, 448, 251, 228, 378, 582, 617, 725], [774, 313, 0, 405, 198, 986, 166, 803, 646, 1000, 1028, 797, 305, 503, 906, 473, 332, 422, 363, 213, 396, 343, 282, 406, 1000, 897, 797, 689, 767, 565, 318, 776, 1284, 757, 121, 102, 65, 890, 926, 591], [678, 540, 404, 0, 563, 585, 249, 967, 245, 898, 697, 812, 531, 669, 635, 375, 413, 649, 589, 439, 622, 545, 508, 494, 840, 783, 586, 288, 933, 729, 207, 489, 883, 554, 292, 333, 470, 680, 813, 194], [933, 472, 198, 564, 0, 1145, 325, 788, 805, 1158, 1186, 956, 464, 662, 1064, 631, 491, 581, 479, 371, 554, 501, 440, 564, 1159, 1056, 956, 848, 925, 723, 476, 935, 1443, 915, 280, 260, 150, 1049, 1085, 750], [381, 684, 987, 585, 1145, 0, 832, 864, 347, 602, 106, 516, 785, 637, 88, 531, 661, 778, 780, 782, 663, 661, 710, 562, 288, 384, 214, 320, 704, 733, 790, 220, 298, 332, 874, 916, 1052, 183, 505, 547], [750, 302, 166, 249, 325, 830, 0, 791, 490, 988, 897, 786, 294, 491, 775, 335, 321, 411, 351, 201, 384, 331, 270, 394, 921, 856, 667, 428, 755, 553, 161, 734, 1128, 626, 54, 95, 232, 760, 885, 435], [493, 490, 799, 971, 788, 864, 787, 0, 969, 553, 831, 351, 576, 330, 779, 628, 549, 432, 477, 591, 414, 461, 519, 504, 733, 640, 695, 732, 166, 249, 938, 797, 1074, 589, 738, 715, 865, 692, 524, 1162], [584, 555, 646, 244, 805, 348, 491, 965, 0, 805, 459, 718, 656, 667, 397, 373, 532, 690, 651, 681, 628, 543, 582, 492, 603, 654, 349, 223, 911, 727, 449, 252, 645, 461, 534, 575, 712, 442, 719, 206], [221, 693, 1000, 898, 1159, 603, 989, 555, 805, 0, 571, 199, 803, 503, 517, 643, 751, 754, 798, 792, 647, 660, 721, 624, 388, 256, 460, 613, 394, 582, 1070, 562, 760, 354, 940, 916, 1066, 431, 141, 1005], [350, 721, 1027, 697, 1186, 107, 896, 832, 459, 573, 0, 484, 822, 619, 128, 569, 698, 815, 817, 819, 701, 698, 747, 599, 183, 312, 253, 432, 672, 714, 902, 332, 242, 304, 886, 943, 1093, 155, 436, 659], [145, 490, 798, 812, 956, 517, 786, 352, 719, 198, 483, 0, 600, 300, 431, 557, 548, 552, 595, 589, 445, 458, 518, 501, 385, 284, 374, 527, 192, 379, 937, 476, 727, 267, 737, 714, 864, 344, 169, 918], [574, 104, 304, 532, 463, 802, 293, 573, 659, 800, 838, 598, 0, 303, 716, 270, 153, 106, 59, 93, 166, 143, 106, 202, 800, 697, 607, 515, 567, 335, 444, 587, 1091, 576, 244, 221, 370, 701, 726, 718], [315, 194, 502, 671, 660, 639, 490, 330, 669, 501, 620, 299, 304, 0, 553, 329, 252, 265, 299, 294, 158, 162, 222, 205, 542, 438, 423, 433, 268, 92, 641, 525, 863, 317, 441, 418, 568, 481, 472, 863], [296, 598, 904, 635, 1063, 88, 773, 778, 397, 516, 127, 430, 699, 551, 0, 446, 575, 692, 694, 696, 577, 575, 624, 476, 246, 298, 128, 265, 618, 647, 839, 140, 378, 246, 763, 820, 970, 97, 419, 596], [423, 166, 472, 375, 631, 534, 334, 618, 373, 644, 570, 558, 267, 320, 448, 0, 144, 301, 262, 264, 243, 155, 193, 103, 594, 529, 340, 229, 583, 380, 433, 319, 824, 299, 324, 388, 538, 433, 558, 567], [524, 63, 330, 414, 489, 662, 319, 552, 533, 749, 698, 547, 153, 253, 576, 143, 0, 187, 148, 122, 145, 92, 51, 85, 722, 656, 467, 388, 516, 314, 470, 447, 952, 427, 270, 247, 396, 561, 686, 605], [544, 138, 423, 650, 581, 780, 411, 436, 694, 753, 848, 550, 108, 265, 694, 304, 188, 0, 51, 211, 113, 178, 140, 237, 770, 667, 585, 509, 520, 220, 562, 565, 1070, 545, 362, 339, 488, 679, 723, 836], [570, 99, 364, 591, 523, 797, 352, 475, 655, 796, 834, 593, 59, 299, 712, 265, 149, 49, 0, 153, 161, 139, 101, 198, 796, 693, 603, 510, 563, 260, 504, 582, 1087, 571, 303, 280, 430, 696, 722, 777], [565, 104, 212, 439, 371, 782, 200, 594, 680, 791, 819, 588, 92, 294, 697, 264, 123, 209, 150, 0, 187, 134, 73, 197, 791, 688, 588, 509, 558, 356, 351, 567, 1072, 548, 151, 128, 278, 681, 717, 625], [429, 81, 390, 617, 549, 665, 378, 413, 632, 646, 733, 443, 167, 158, 579, 242, 140, 113, 163, 182, 0, 75, 111, 175, 655, 552, 470, 394, 413, 175, 530, 450, 955, 430, 329, 306, 456, 564, 581, 804], [433, 34, 342, 545, 501, 661, 330, 460, 543, 659, 697, 457, 144, 162, 575, 153, 92, 178, 139, 134, 74, 0, 62, 86, 660, 556, 466, 398, 426, 222, 482, 446, 951, 435, 281, 258, 408, 560, 585, 736], [494, 33, 282, 509, 440, 711, 270, 523, 582, 720, 748, 517, 106, 223, 626, 193, 52, 140, 101, 73, 116, 63, 0, 126, 720, 617, 517, 437, 487, 285, 421, 496, 1001, 477, 221, 198, 348, 610, 646, 695], [401, 99, 406, 494, 565, 562, 395, 500, 492, 622, 598, 496, 200, 201, 477, 102, 86, 234, 195, 198, 176, 87, 127, 0, 622, 524, 368, 291, 465, 262, 530, 347, 852, 328, 346, 323, 472, 461, 553, 686], [235, 694, 1002, 841, 1160, 291, 920, 733, 603, 389, 183, 385, 804, 543, 247, 593, 723, 772, 799, 793, 657, 662, 722, 624, 0, 128, 258, 486, 572, 638, 1019, 360, 373, 309, 941, 918, 1067, 161, 252, 802], [133, 592, 899, 782, 1058, 384, 854, 639, 655, 257, 311, 284, 702, 441, 298, 527, 657, 669, 697, 691, 555, 559, 620, 529, 129, 0, 310, 497, 479, 536, 953, 412, 501, 238, 839, 815, 965, 213, 120, 854], [239, 490, 796, 586, 955, 219, 665, 695, 348, 459, 252, 373, 591, 421, 133, 338, 468, 585, 587, 588, 470, 467, 517, 369, 258, 309, 0, 231, 566, 517, 764, 105, 495, 116, 656, 712, 862, 97, 374, 547], [393, 411, 689, 288, 848, 312, 427, 730, 223, 614, 423, 528, 512, 432, 265, 229, 388, 507, 507, 509, 392, 399, 437, 291, 486, 498, 232, 0, 721, 492, 492, 131, 609, 269, 577, 618, 755, 326, 528, 422], [333, 459, 767, 936, 926, 704, 755, 166, 911, 393, 671, 191, 569, 269, 618, 594, 517, 521, 564, 559, 414, 427, 487, 470, 572, 479, 566, 719, 0, 268, 907, 668, 914, 460, 706, 683, 833, 532, 364, 1110], [414, 255, 564, 736, 723, 737, 553, 248, 734, 583, 718, 381, 341, 95, 651, 394, 314, 219, 263, 356, 180, 227, 285, 270, 640, 537, 521, 498, 264, 0, 704, 624, 961, 415, 503, 480, 630, 579, 554, 928], [848, 452, 317, 209, 475, 790, 162, 942, 450, 1069, 902, 936, 444, 642, 840, 433, 471, 561, 502, 352, 535, 482, 421, 529, 1019, 953, 764, 493, 906, 704, 0, 695, 1088, 724, 204, 246, 383, 858, 983, 395], [341, 469, 775, 489, 934, 219, 736, 798, 252, 562, 331, 476, 570, 524, 140, 317, 447, 564, 566, 567, 449, 446, 496, 348, 360, 411, 106, 131, 669, 619, 694, 0, 517, 219, 778, 692, 841, 199, 476, 451], [592, 975, 1284, 883, 1443, 299, 1129, 1075, 645, 761, 243, 727, 1076, 862, 379, 823, 952, 1069, 1071, 1073, 954, 952, 1001, 853, 371, 500, 496, 618, 914, 957, 1087, 518, 0, 547, 1172, 1197, 1350, 398, 624, 844], [132, 450, 757, 553, 915, 333, 626, 589, 462, 353, 302, 267, 576, 315, 247, 298, 428, 544, 571, 548, 429, 434, 477, 329, 307, 237, 117, 268, 460, 411, 725, 219, 545, 0, 616, 673, 822, 192, 267, 661], [713, 252, 123, 292, 282, 873, 53, 742, 532, 939, 886, 736, 244, 442, 764, 324, 271, 361, 302, 152, 335, 282, 221, 345, 939, 836, 655, 576, 706, 504, 204, 777, 1170, 615, 0, 46, 189, 749, 865, 478], [690, 230, 101, 334, 260, 915, 95, 719, 574, 916, 944, 714, 221, 419, 822, 389, 248, 339, 279, 129, 312, 259, 198, 322, 916, 813, 713, 618, 683, 481, 246, 693, 1198, 673, 46, 0, 167, 807, 842, 520], [839, 379, 66, 471, 149, 1052, 232, 868, 711, 1065, 1093, 863, 371, 568, 971, 538, 398, 488, 428, 278, 461, 408, 347, 471, 1066, 962, 862, 755, 832, 630, 383, 842, 1349, 822, 187, 167, 0, 956, 991, 657], [209, 584, 890, 679, 1049, 183, 759, 692, 442, 430, 155, 344, 685, 478, 97, 432, 561, 678, 680, 682, 563, 561, 610, 462, 160, 211, 97, 325, 531, 574, 858, 199, 398, 191, 749, 806, 956, 0, 332, 641], [140, 618, 926, 811, 1085, 505, 884, 522, 719, 140, 435, 167, 728, 470, 420, 557, 686, 722, 723, 718, 581, 586, 646, 555, 253, 121, 373, 527, 362, 549, 983, 476, 625, 267, 865, 842, 992, 334, 0, 918], [792, 726, 591, 197, 749, 556, 436, 1159, 215, 1012, 667, 926, 718, 861, 605, 567, 605, 835, 776, 626, 809, 737, 695, 685, 811, 862, 556, 431, 1119, 921, 394, 460, 853, 669, 479, 520, 657, 650, 927, 0]];
+function nrm(x){return x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim()}
+function resolveLieu(t){var n=nrm(t),best=null,bl=0,exact=false;Object.keys(LIEUX).forEach(function(k){var kn=nrm(k),kb=nrm(k.replace(/\(.*\)/,""));if(kn===n||kb===n){best=k;bl=99;exact=true}else if(!exact&&kb.length>2&&(" "+n+" ").indexOf(" "+kb+" ")>=0&&kb.length>bl){best=k;bl=kb.length}});return best?{k:best,exact:exact}:null}
+function esc(x){return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+function sugBox(id){return $(id==="lieuDep"?"sugDep":"sugArr")}
+function sugShow(id,items){var bx=sugBox(id),h="";items.forEach(function(x){h+='<div class="sg" data-v="'+esc(x)+'">'+esc(x)+'</div>'});bx.innerHTML=h;bx.classList.toggle("hide",!items.length)}
+function sugUpdate(id){var q=$(id).value.trim();if(q.length<2){sugShow(id,[]);return}var nq=nrm(q);
+ var loc=Object.keys(LIEUX).filter(function(k){return nrm(k).indexOf(nq)>=0}).slice(0,4);sugShow(id,loc);
+ if(q.length<3||typeof fetch!=="function")return;
+ banSearch(q).then(function(a){if($(id).value.trim()!==q)return;a.forEach(function(x){ADR[x.l]=x.c});sugShow(id,a.map(function(x){return x.l}).concat(loc.filter(function(k){return true})).slice(0,8))}).catch(function(){})}
+function sugPick(id,v){$(id).value=v;sugShow(id,[]);clearTimeout(convTimer);applyConv(false)}
+function distReel(a,b){var ia=DIST_N.indexOf(a),ib=DIST_N.indexOf(b),fa=DIST_FR.indexOf(a),fb=DIST_FR.indexOf(b);if(ia>=0&&fb>=0&&a!==b)return DIST_M[ia][fb];if(ib>=0&&fa>=0&&a!==b)return DIST_M[ib][fa];return 0}
+
+function distKm(a,b){var A=LIEUX[a],B=LIEUX[b];if(!A||!B)return 0;var r=Math.PI/180,dl=(B[0]-A[0])*r,dn=(B[1]-A[1])*r,x=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(A[0]*r)*Math.cos(B[0]*r)*Math.sin(dn/2)*Math.sin(dn/2);var d=2*6371*Math.asin(Math.sqrt(x));return Math.round(d*(d<500?1.25:1.35));}
+var convTok=0,convTimer=null,sugTimer={},ADR={};
+function banSearch(q){return fetch("https://api-adresse.data.gouv.fr/search/?limit=5&q="+encodeURIComponent(q)).then(function(r){return r.json()}).then(function(j){return (j&&j.features||[]).map(function(f){return {l:f.properties.label,c:[f.geometry.coordinates[1],f.geometry.coordinates[0]]}})})}
+
+function conv(msg){$("convHint").textContent=msg}
+function setKm(km,src){$("kmConv").value=km;$("convoy").value=Math.round(km*TARIF_KM);conv(km.toLocaleString("fr-FR")+" km × 1,30 € = "+Math.round(km*TARIF_KM).toLocaleString("fr-FR")+" € ("+src+"). Vous pouvez corriger."); render()}
+function gmapsLink(){var a=$("lieuDep").value.trim(),b=$("lieuArr").value.trim();$("gmaps").href="https://www.google.com/maps/dir/?api=1&travelmode=driving&origin="+encodeURIComponent(a)+"&destination="+encodeURIComponent(b)}
+function applyConv(fromKm){gmapsLink();
+ if(fromKm){convTok++;var k=+$("kmConv").value||0;$("convoy").value=Math.round(k*TARIF_KM);conv(k.toLocaleString("fr-FR")+" km × 1,30 € = "+Math.round(k*TARIF_KM).toLocaleString("fr-FR")+" € (kilomètres saisis).");return}
+ var a=$("lieuDep").value.trim(),b=$("lieuArr").value.trim();if(!a||!b)return;
+ var tok=++convTok,ra=resolveLieu(a),rb=resolveLieu(b),rk=(ra&&rb)?distReel(ra.k,rb.k):0;
+ if(rk>0&&ra.exact&&rb.exact){setKm(rk,"distance routière réelle, OSRM / OpenStreetMap");return}
+ if(rk>0)setKm(rk,"distance routière réelle entre les villes "+ra.k+" et "+rb.k+" : calcul de l'adresse exacte en cours…");
+ var est=(ra&&rb)?distKm(ra.k,rb.k):0;if(!rk&&est>0)setKm(est,"estimation à vol d'oiseau majorée pour les routes, ± 15 % : calcul routier en cours…");
+ if(typeof fetch!=="function"){if(!est)conv("Lieu inconnu : choisissez une ville de la liste ou saisissez les kilomètres.");return}
+ function geo(n){if(LIEUX[n])return Promise.resolve(LIEUX[n]);if(ADR[n])return Promise.resolve(ADR[n]);return banSearch(n).then(function(a){if(a[0])return a[0].c;throw new Error("ban")}).catch(function(){return fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+encodeURIComponent(n)).then(function(r){return r.json()}).then(function(j){if(!j||!j[0])throw new Error("lieu");return [+j[0].lat,+j[0].lon]})})}
+ Promise.all([geo(a),geo(b)]).then(function(c){return fetch("https://router.project-osrm.org/route/v1/driving/"+c[0][1]+","+c[0][0]+";"+c[1][1]+","+c[1][0]+"?overview=false")}).then(function(r){return r.json()}).then(function(j){
+  if(tok!==convTok)return;if(!j||!j.routes||!j.routes[0])throw new Error("route");
+  setKm(Math.round(j.routes[0].distance/1000),"distance routière réelle, OpenStreetMap / OSRM")
+ }).catch(function(){if(tok!==convTok)return;if(rk>0){conv(rk.toLocaleString("fr-FR")+" km × 1,30 € = "+Math.round(rk*TARIF_KM).toLocaleString("fr-FR")+" € (distance routière réelle entre les villes détectées ; adresse exacte non calculée).");return}conv(est>0?"Calcul routier indisponible : distance estimée à "+est.toLocaleString("fr-FR")+" km (à vol d'oiseau majorée, ± 15 %), soit "+Math.round(est*TARIF_KM).toLocaleString("fr-FR")+" €. Saisissez les kilomètres réels si vous les connaissez.":"Lieu introuvable : vérifiez l'adresse ou saisissez directement les kilomètres.")})
+}
+var DEV={EUR:["Euro (EUR)",1],USD:["Dollar américain (USD)",1.1206],GBP:["Livre sterling (GBP)",0.84763],JPY:["Yen japonais (JPY)",177.34],KRW:["Won sud-coréen (KRW)",1503.27],CNY:["Yuan chinois (CNY)",7.4992],CAD:["Dollar canadien (CAD)",1.5942],CHF:["Franc suisse (CHF)",0.9313],AED:["Dirham des Émirats (AED)",4.1157],SGD:["Dollar de Singapour (SGD)",1.4348],AUD:["Dollar australien (AUD)",1.6052],HKD:["Dollar de Hong Kong (HKD)",8.7940],THB:["Baht thaïlandais (THB)",37.574],MYR:["Ringgit malaisien (MYR)",4.5777],INR:["Roupie indienne (INR)",108.3965],IDR:["Roupie indonésienne (IDR)",20036.94],AUTRE:["Autre devise (cours à saisir)",1]};
+var DEV_ISO="2026-10-09",DEV_DATE="9 octobre 2026",DEV_LIVE=null;
+function devInit(){var h="";Object.keys(DEV).forEach(function(k){h+='<option value="'+k+'">'+DEV[k][0]+'</option>'});$("devise").innerHTML=h;$("devise").value="EUR";devSetRate()}
+function devSetRate(){var d=$("devise").value;$("taux").value=(DEV_LIVE&&DEV_LIVE[d])?DEV_LIVE[d]:DEV[d][1];$("taux").readOnly=false;devHint()}
+function devHint(){var d=$("devise").value;$("tauxHint").textContent=d==="EUR"?"Prix saisi en euros : aucune conversion.":d==="AUTRE"?"Saisissez le cours : nombre d'unités de votre devise pour 1 €.":(DEV_LIVE&&DEV_LIVE[d]?"Cours BCE en ligne du "+DEV_LIVE._date+" (modifiable).":"Cours de référence BCE du "+DEV_DATE+(d==="AED"?" (AED calculé via la parité fixe 1 USD = 3,6725 AED)":"")+" (modifiable)."+((Date.now()-new Date(DEV_ISO).getTime())>7*864e5?" ⚠ Cours intégrés datant de plus de 7 jours : vérifiez ou modifiez le cours.":"")+" Le cours réel appliqué par votre banque ou la douane peut différer.")}
+function convEur(){var t=+$("taux").value;if(!(t>0))t=1;var v=Math.round((+$("prixDev").value||0)/t*100)/100;$("prix").value=v;return v}
+function devLive(){try{fetch("https://api.frankfurter.dev/v1/latest?base=EUR").then(function(r){return r.json()}).then(function(j){if(!j||!j.rates)return;var m={};Object.keys(j.rates).forEach(function(k){m[k]=j.rates[k]});if(m.USD)m.AED=Math.round(m.USD*3.6725*10000)/10000;m._date=j.date;DEV_LIVE=m;if($("devise").value!=="AUTRE"&&$("devise").value!=="EUR"&&m[$("devise").value])$("taux").value=m[$("devise").value];devHint();render()}).catch(function(){})}catch(e){}}
+function read(){convEur();return{orig:$("orig").value,prix:+$("prix").value||0,transFront:+$("transFront").value||0,convoy:+$("convoy").value||0,prefTaux:+$("prefTaux").value||0,
+ vtype:$("vtype").value,dmc:$("dmc").value,km:+$("km").value||0,cv:+$("cv").value||1,mas:+$("mas").value||0,ener:$("ener").value,recep:$("recep").value,co2:+$("co2").value||0,norme:$("norme").value,
+ phev:$("phev").checked,handi:$("handi").checked,reg:+$("reg").value,fraisDouane:+$("fraisDouane").value||0,conf:$("conf").value,confCost:+$("confCost").value||0,ctCost:+$("ctCost").value||0,cpiCost:+$("cpiCost").value||0,plaques:+$("plaques").value||0,plaqueType:$("plaqueType").value,mandat:+$("mandat").value||0};}
+function render(){
+ var i=read(),now=new Date(),r=compute(i,now);
+ var tv=0,tvl="";r.groups.forEach(function(g){g.l.forEach(function(l){if(!l.i&&/^TVA/.test(l.t)){tv+=l.v;tvl=l.t}})});
+ $("tvaMontant").value=tv.toFixed(2);$("tvaHint").textContent=tv>0?tvl+" : montant calculé automatiquement, déjà compris dans le total.":"Aucune TVA à payer en France pour ce cas (véhicule d'occasion acheté dans l'UE). Elle est calculée automatiquement.";
+ var ue=i.orig==="ue",vt=(i.vtype==="vp"||i.vtype==="camping");
+ $("prefBox").classList.toggle("hide",i.orig!=="pref");
+ $("transFrontBox").classList.toggle("hide",ue);
+ $("douaneBox").classList.toggle("hide",ue);
+ $("malusBox").classList.toggle("hide",!vt);
+ $("co2Box").classList.toggle("hide",i.recep!=="ue"||!vt);
+ var age=yearsSince(i.dmc,now);
+ $("ctBox").classList.toggle("hide",age<4);
+ $("ageHint").textContent=i.dmc?"Ancienneté : "+age+" an"+(age>1?"s":"")+" ("+monthsSince(i.dmc,now)+" mois)":"";
+ $("origHint").textContent={ue:"Aucun droit de douane. TVA française seulement si le véhicule a moins de 6 mois ou moins de 6 000 km.",tiers:"Droits de douane (10 % pour une voiture) puis TVA 20 % sur la valeur en douane + droits.",us:"Droit de douane à 0 % pour les véhicules d'origine américaine (règlement UE 2026/1455) ; TVA 20 % due.",pref:"Droits réduits ou nuls selon l'accord (certificat d'origine) ; TVA 20 % due."}[i.orig];
+ var h="";
+ r.groups.forEach(function(g){h+='<tr class="grp"><td colspan="2">'+esc(g.t)+'</td></tr>';g.l.forEach(function(l){h+='<tr class="'+(l.e?"est":"")+'"><td>'+esc(l.t)+'</td><td>'+eur(l.v)+'</td></tr>';});});
+ $("tab").innerHTML=h;
+ $("tot").textContent=eur(r.total);
+ $("totsub").textContent="dont "+eur(r.hors)+" de taxes, formalités et frais en plus du prix d'achat";
+ $("alerts").innerHTML="";
+ $("chkl").innerHTML=r.list.map(function(a){return "<li>"+esc(a)+"</li>";}).join("");
+}
+if(typeof document!=="undefined"&&document.getElementById("orig")){
+ REG.forEach(function(r,k){var o=document.createElement("option");o.value=k;o.textContent=r[0]+" ("+String(r[1]).replace(".",",")+" €/CV)";$("reg").appendChild(o)});
+ ["orig","lieuDep","lieuArr","kmConv","fretZone","prefPays","prixDev","taux","transFront","convoy","prefTaux","vtype","dmc","km","cv","mas","ener","recep","co2","norme","phev","handi","reg","fraisDouane","conf","confCost","ctCost","cpiCost","plaqueType","plaques","mandat"].forEach(function(k){$(k).addEventListener("input",render);$(k).addEventListener("change",render);if(k==='lieuDep'||k==='lieuArr'){var bx=sugBox(k);var pickH=function(e){var t=e.target;while(t&&!(t.getAttribute&&t.getAttribute('data-v')!==null))t=t.parentNode;if(t){e.preventDefault();sugPick(k,t.getAttribute('data-v'))}};bx.addEventListener('mousedown',pickH);bx.addEventListener('touchend',pickH);bx.addEventListener('click',pickH);$(k).addEventListener('blur',function(){setTimeout(function(){sugShow(k,[])},200)});$(k).addEventListener('change',function(){applyConv(false)});$(k).addEventListener('input',function(){clearTimeout(sugTimer[k]);sugTimer[k]=setTimeout(function(){sugUpdate(k)},250);clearTimeout(convTimer);convTimer=setTimeout(function(){applyConv(false)},(LIEUX[$(k).value.trim()]||ADR[$(k).value.trim()])?0:1500)})}if(k==='taux')$(k).addEventListener('input',function(){});if(k==='plaqueType')$(k).addEventListener('change',function(){$('plaques').value=$('plaqueType').value==='etr'?90:40;render()});if(k==='kmConv')$(k).addEventListener('input',function(){applyConv(true);render()});if(k==='conf')$(k).addEventListener('change',function(){$('confCost').value={coc:300,homop:1500,homoc:4500}[$('conf').value];render()});if(k==='fretZone')$(k).addEventListener('change',function(){applyFret();render()});if(k==='orig')$(k).addEventListener('change',function(){if($('orig').value==='us')$('fretZone').value='usa';applyFret();render()});if(k==='prefPays')$(k).addEventListener('change',function(){var o=$('prefPays');if(o.value!=='')$('prefTaux').value=o.value;var tx=o.options[o.selectedIndex].text;var mz=[[/Japon/,'jp'],[/Corée/,'kr'],[/Singapour/,'sg'],[/Vietnam/,'vn'],[/Royaume-Uni/,'uk'],[/Canada/,'can']];for(var q=0;q<mz.length;q++)if(mz[q][0].test(tx)){$('fretZone').value=mz[q][1];applyFret();break}render()})});
+ var d0=new Date();d0.setFullYear(d0.getFullYear()-6);$("dmc").value=d0.toISOString().slice(0,10);$("dmc").max=new Date().toISOString().slice(0,10);
+ devInit();$("devise").addEventListener("change",function(){devSetRate();render()});$("taux").addEventListener("input",devHint);applyFret();render();devLive();
+}
+</script>
+</body>
+</html>
