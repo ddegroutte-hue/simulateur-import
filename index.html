@@ -44,6 +44,7 @@ a{color:var(--ac)}
 .hide{display:none}
 .fretDet{margin:6px 0 10px}.fretDet summary{cursor:pointer;font-size:13px;color:var(--accent,#1a56db);padding:4px 0}
 .sgw{position:relative}.sug{position:absolute;left:0;right:0;top:100%;z-index:20;background:var(--card);border:1px solid var(--bd);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);max-height:240px;overflow:auto;margin-top:2px}.sug.hide{display:none}.sg{padding:9px 10px;cursor:pointer;font-size:.92rem;border-bottom:1px solid var(--bd)}.sg:last-child{border-bottom:0}.sg:hover,.sg.on{background:var(--acbg)}
+.subh{font-size:.95rem;margin:14px 0 4px;color:var(--ac);font-weight:700}
 </style>
 </head>
 <body>
@@ -84,12 +85,14 @@ a{color:var(--ac)}
 <label for="prefTaux">Taux de droit de douane préférentiel (%)</label>
 <input type="number" id="prefTaux" min="0" max="30" step="0.1" value="0">
 <div class="hint">Selon l'accord et le certificat d'origine (EUR.1…) : à vérifier auprès de la douane.</div></div>
-<div class="row2">
 <div><label for="prixDev">Prix d'achat</label><div class="row2"><input type="number" id="prixDev" min="0" step="100" value="15000"><select id="devise"></select></div>
 <label for="taux" style="margin-top:8px">Cours : 1 € =</label><input type="number" id="taux" min="0" step="any" value="1">
 <small id="tauxHint" class="hint"></small>
 <label for="prix" style="margin-top:8px">Prix d'achat converti (€)</label><input type="number" id="prix" value="15000" readonly></div>
-<div id="transFrontBox"><label for="fretZone">Pays de provenance (prix moyen du transport constaté, prérempli)</label>
+</div>
+
+<div class="card"><h2>2. Transport et convoyage</h2>
+<div id="transFrontBox"><h3 class="subh">Transport (conteneur)</h3><label for="fretZone">Pays de provenance (prix moyen du transport constaté, prérempli)</label>
 <select id="fretZone">
 <optgroup label="Amérique du Nord">
 <option value="usa">États-Unis</option>
@@ -115,8 +118,8 @@ a{color:var(--ac)}
 </select>
 <label for="transFront">Transport en conteneur + assurance jusqu'au port d'arrivée (€)</label><input type="number" id="transFront" min="0" step="50" value="0">
 <details class="fretDet"><summary>Voir le détail du prix moyen et les sources</summary><div class="hint" id="fretHint"></div></details></div>
-</div>
 
+<h3 class="subh">Convoyage (du port ou du lieu de départ jusqu'à chez vous)</h3>
 <div class="row2"><div><label for="lieuDep">Lieu de départ</label><div class="sgw"><input type="text" id="lieuDep" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" placeholder="Adresse complète, ville ou port" autocomplete="off"><div class="sug hide" id="sugDep"></div></div></div>
 <div><label for="lieuArr">Lieu d'arrivée</label><div class="sgw"><input type="text" id="lieuArr" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" placeholder="Adresse complète, ville" autocomplete="off"><div class="sug hide" id="sugArr"></div></div></div></div>
 <div class="row2"><div><label for="kmConv">Distance estimée (km)</label><input type="number" id="kmConv" min="0" step="10" value="0"></div>
@@ -127,7 +130,7 @@ a{color:var(--ac)}
 <div class="hint" id="convHint">Saisissez un départ et une arrivée (adresse complète : numéro, rue, code postal, ville ; ou simplement une ville ou un port) : la distance routière réelle est calculée automatiquement, puis multipliée par 1,30 €. Vous pouvez corriger les kilomètres ou le montant.</div>
 </div>
 
-<div class="card"><h2>2. Le véhicule</h2>
+<div class="card"><h2>3. Le véhicule</h2>
 <label for="vtype">Type de véhicule</label>
 <select id="vtype">
 <option value="vp">Voiture (véhicule de tourisme)</option>
@@ -179,11 +182,11 @@ a{color:var(--ac)}
 </div>
 </div>
 
-<div class="card"><h2>3. Votre région</h2>
+<div class="card"><h2>4. Votre région</h2>
 <label for="reg">Région de résidence (tarif de la taxe régionale)</label>
 <select id="reg"></select></div>
 
-<div class="card"><h2>4. Frais à saisir</h2>
+<div class="card"><h2>5. Frais à saisir</h2>
 <div class="hint">Ces postes n'ont pas de tarif officiel national : saisissez vos devis. Laissés à 0, ils ne sont pas comptés.</div>
 <label for="tvaMontant">TVA (€)</label><input type="number" id="tvaMontant" value="0" readonly>
 <div class="hint" id="tvaHint"></div>
@@ -271,10 +274,11 @@ function compute(i,now){
  var ue=i.orig==="ue",moto=(i.vtype==="moto250"||i.vtype==="moto250p"),vt=(i.vtype==="vp"||i.vtype==="camping");
  var mois=monthsSince(i.dmc,now),age=yearsSince(i.dmc,now),yr=i.dmc?+i.dmc.slice(0,4):now.getFullYear();
  // 1. Achat
- var g1=grp("Achat et transport");
+ var g1=grp("Achat");
  add(g1,"Prix d'achat du véhicule",i.prix);
- if(!ue&&i.transFront>0)add(g1,"Transport en conteneur et assurance jusqu'au port d'arrivée",i.transFront);
-  if(i.convoy>0)add(g1,ue?"Convoyage":"Convoyage jusqu'à chez vous",i.convoy);
+ if((!ue&&i.transFront>0)||i.convoy>0){var gT=grp("Transport et convoyage");
+  if(!ue&&i.transFront>0)add(gT,"Transport en conteneur et assurance jusqu'au port d'arrivée",i.transFront);
+  if(i.convoy>0)add(gT,ue?"Convoyage":"Convoyage jusqu'à chez vous",i.convoy);}
  // 2. Taxes d'import
  var g2=grp("Taxes à l'import");
  var neufFisc=(mois<6||i.km<6000);
