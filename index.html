@@ -45,6 +45,21 @@ a{color:var(--ac)}
 .fretDet{margin:6px 0 10px}.fretDet summary{cursor:pointer;font-size:13px;color:var(--accent,#1a56db);padding:4px 0}
 .sgw{position:relative}.sug{position:absolute;left:0;right:0;top:100%;z-index:20;background:var(--card);border:1px solid var(--bd);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);max-height:240px;overflow:auto;margin-top:2px}.sug.hide{display:none}.sg{padding:9px 10px;cursor:pointer;font-size:.92rem;border-bottom:1px solid var(--bd)}.sg:last-child{border-bottom:0}.sg:hover,.sg.on{background:var(--acbg)}
 .subh{font-size:.95rem;margin:14px 0 4px;color:var(--ac);font-weight:700}
+
+.wiz .st>h2{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;margin:0}
+.wiz .st>h2 .stsub{font-size:.85rem;font-weight:700;background:var(--acbg);color:var(--ac);border-radius:999px;padding:4px 12px;white-space:nowrap}
+.wiz .st>h2 .stsub:empty{display:none}
+.wiz .st.closed>h2::after{content:"Modifier";font-size:.78rem;font-weight:600;color:var(--mut);margin-left:6px}
+.wiz .st.open>h2{margin-bottom:8px}
+.wiz .st.closed .stbody{display:none}
+.wiz .st.locked,.wiz .endc.locked{display:none}
+.wiz .st.done>h2::before{content:"\2713";color:var(--ok);margin-right:4px}
+.stbtn{display:block;width:100%;margin-top:18px;padding:14px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stbtn{color:#12141c}}
+#bar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--ac);box-shadow:0 -4px 16px rgba(0,0,0,.12);font-size:1rem}
+#bar b{font-size:1.35rem;color:var(--ac)}
+#bar.hide{display:none}
+body.wiz{padding-bottom:70px}
 </style>
 </head>
 <body>
@@ -54,7 +69,7 @@ a{color:var(--ac)}
 <h1>🌍 Simulateur d'import de véhicule d'occasion</h1>
 <p class="sub">Coût complet d'un véhicule d'occasion acheté à l'étranger (UE ou hors UE) et immatriculé en France : taxes d'import, certificat d'immatriculation, malus et frais à prévoir.</p>
 
-<div class="card"><h2>1. Achat</h2>
+<div class="card st" id="st1"><h2>1. Achat</h2>
 <label for="orig">Où achetez-vous le véhicule ?</label>
 <select id="orig">
 <option value="ue">Pays de l'Union européenne</option>
@@ -98,7 +113,7 @@ a{color:var(--ac)}
 <div class="hint" id="vHint">La puissance fiscale, la masse et le CO₂ du bloc 3 se remplissent automatiquement. Modèle absent de la liste : choisissez « Autre véhicule » et saisissez les valeurs de la carte grise.</div>
 </div>
 
-<div class="card"><h2>2. Transport et convoyage</h2>
+<div class="card st" id="st2"><h2>2. Transport et convoyage</h2>
 <div id="transFrontBox"><h3 class="subh">Transport (conteneur)</h3><label for="fretZone">Pays de provenance (prix moyen du transport constaté, prérempli)</label>
 <select id="fretZone">
 <optgroup label="Amérique du Nord">
@@ -137,7 +152,7 @@ a{color:var(--ac)}
 <div class="hint" id="convHint">Saisissez un départ et une arrivée (adresse complète : numéro, rue, code postal, ville ; ou simplement une ville ou un port) : la distance routière réelle est calculée automatiquement, puis multipliée par 1,30 €. Vous pouvez corriger les kilomètres ou le montant.</div>
 </div>
 
-<div class="card"><h2>3. Certificat d'immatriculation</h2>
+<div class="card st" id="st3"><h2>3. Certificat d'immatriculation</h2>
 <label for="vtype">Type de véhicule</label>
 <select id="vtype">
 <option value="vp">Voiture (véhicule de tourisme)</option>
@@ -191,7 +206,7 @@ a{color:var(--ac)}
 <select id="reg"></select>
 </div>
 
-<div class="card"><h2>4. Frais à saisir</h2>
+<div class="card st" id="st4"><h2>4. Frais à saisir</h2>
 <div class="hint">Ces postes n'ont pas de tarif officiel national : saisissez vos devis. Laissés à 0, ils ne sont pas comptés.</div>
 <label for="tvaMontant">TVA (€)</label><input type="number" id="tvaMontant" value="0" readonly>
 <div class="hint" id="tvaHint"></div>
@@ -213,17 +228,17 @@ a{color:var(--ac)}
 </div>
 </div>
 
-<div class="card res"><h2>Coût complet de l'import</h2>
+<div class="card endc res" id="endres"><h2>Coût complet de l'import</h2>
 <p class="tot" id="tot">–</p>
 <p class="totsub" id="totsub"></p>
 <div id="alerts"></div>
 <table id="tab"></table>
 <p class="note">Estimation indicative. Les lignes en gris sont des estimations (barème 2026 appliqué à un import, ou montants non vérifiés). Vérifiez le montant exact sur <b>service-public.gouv.fr</b> (simulateur du coût du certificat d'immatriculation), auprès de la <b>douane</b> et de l'<b>ANTS</b> avant tout achat.</p></div>
 
-<div class="card"><h2>Formalités et obligations</h2>
+<div class="card endc"><h2>Formalités et obligations</h2>
 <ul class="chkl" id="chkl"></ul></div>
 
-<div class="card"><h2>Sources officielles</h2>
+<div class="card endc"><h2>Sources officielles</h2>
 <ul class="chkl">
 <li><a href="https://www.douane.gouv.fr/fiche/achat-dun-vehicule-letranger-ou-dans-un-dom-com" target="_blank" rel="noopener">Douane – achat d'un véhicule à l'étranger</a> (droits de douane, TVA, certificat 846 A, assurance frontière)</li>
 <li><a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F2991" target="_blank" rel="noopener">Service-Public – achat d'un véhicule dans l'UE</a> (TVA, quitus fiscal)</li>
@@ -234,6 +249,7 @@ a{color:var(--ac)}
 <li><a href="https://eur-lex.europa.eu/legal-content/FR/TXT/PDF/?uri=OJ%3AL_202601455" target="_blank" rel="noopener">Règlement (UE) 2026/1455</a> (droit de douane à 0 % pour les véhicules d'origine américaine)</li>
 </ul></div>
 </main>
+<div id="bar" class="hide"><span>Total provisoire</span><b id="barv">0 €</b></div>
 <script>
 
 // Tarif du cheval fiscal par région (€) – à vérifier / mettre à jour chaque année
@@ -480,6 +496,16 @@ function devLive(){try{fetch("https://api.frankfurter.dev/v1/latest?base=EUR").t
 function read(){convEur();return{orig:$("orig").value,prix:+$("prix").value||0,transFront:+$("transFront").value||0,convoy:+$("convoy").value||0,prefTaux:+$("prefTaux").value||0,
  vtype:$("vtype").value,dmc:$("dmc").value,km:+$("km").value||0,cv:+$("cv").value||1,mas:+$("mas").value||0,ener:$("ener").value,recep:$("recep").value,co2:+$("co2").value||0,norme:$("norme").value,
  phev:$("phev").checked,handi:$("handi").checked,reg:+$("reg").value,fraisDouane:+$("fraisDouane").value||0,conf:$("conf").value,confCost:+$("confCost").value||0,ctCost:+$("ctCost").value||0,cpiCost:+$("cpiCost").value||0,plaques:+$("plaques").value||0,plaqueType:$("plaqueType").value,mandat:+$("mandat").value||0};}
+
+var WZ={n:0,open:1,on:false};
+function wizSums(r){var a=[0,0,0,0,0];r.groups.forEach(function(g){var v=0;g.l.forEach(function(l){if(!l.i)v+=l.v});var k=g.t==="Achat"?1:g.t==="Transport et convoyage"?2:/^Certificat/.test(g.t)?3:4;a[k]+=v});return a}
+function wizShow(){if(!WZ.on)return;for(var k=1;k<=4;k++){var c=$("st"+k),cl=c.className.replace(/ (open|closed|locked|done)/g,"");var st=k>WZ.n?"locked":(k===WZ.open?"open":"closed");if(k<WZ.n)st+=" done";c.className=cl+" "+st}
+ var ends=document.querySelectorAll(".endc");for(var j=0;j<ends.length;j++){ends[j].className=ends[j].className.replace(/ ?locked/g,"")+(WZ.n>=5?"":" locked")}
+ $("bar").className=(WZ.n>=1&&WZ.n<5)?"":"hide"}
+function wizSub(r){if(!WZ.on)return;var a=wizSums(r),run=0;for(var k=1;k<=4;k++){var e=$("ss"+k);if(e)e.textContent=(k<=WZ.n||k===WZ.open)?"Sous-total : "+eur(a[k]):"";if(k<=Math.min(WZ.n,4))run+=a[k]}if(WZ.n>=4)run=r.total;$("barv").textContent=eur(run)}
+function wizGo(k){WZ.open=k;if(k>WZ.n)WZ.n=k;wizShow();render();try{$("st"+(k<=4?k:4)).scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}
+function wizInit(){try{var k;for(k=1;k<=4;k++){(function(k){var c=$("st"+k),h=c.getElementsByTagName("h2")[0];var sp=document.createElement("span");sp.className="stsub";sp.id="ss"+k;h.appendChild(sp);var b=document.createElement("div");b.className="stbody";while(h.nextSibling)b.appendChild(h.nextSibling);c.appendChild(b);var bt=document.createElement("button");bt.type="button";bt.className="stbtn";bt.textContent=k<4?"Continuer : "+["","","Transport et convoyage","Certificat d\u2019immatriculation","Frais \u00e0 saisir"][k]+" \u2192":"Voir le co\u00fbt complet";bt.addEventListener("click",function(){if(k===4){WZ.n=5;WZ.open=0;wizShow();render();try{$("endres").scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}else wizGo(k+1)});b.appendChild(bt);h.addEventListener("click",function(){if(k>WZ.n)return;WZ.open=(WZ.open===k)?0:k;wizShow();render()})})(k)}
+ document.body.className+=" wiz";WZ.on=true;WZ.n=1;WZ.open=1;wizShow()}catch(e){document.body.className=document.body.className.replace(/ ?wiz/g,"");WZ.on=false}}
 function render(){
  var i=read(),now=new Date(),r=compute(i,now);
  var tv=0,tvl="";r.groups.forEach(function(g){g.l.forEach(function(l){if(!l.i&&/^TVA/.test(l.t)){tv+=l.v;tvl=l.t}})});
@@ -496,7 +522,7 @@ function render(){
  $("origHint").textContent={ue:"Aucun droit de douane. TVA française seulement si le véhicule a moins de 6 mois ou moins de 6 000 km.",tiers:"Droits de douane (10 % pour une voiture) puis TVA 20 % sur la valeur en douane + droits.",us:"Droit de douane à 0 % pour les véhicules d'origine américaine (règlement UE 2026/1455) ; TVA 20 % due.",pref:"Droits réduits ou nuls selon l'accord (certificat d'origine) ; TVA 20 % due."}[i.orig];
  var h="";
  r.groups.forEach(function(g){h+='<tr class="grp"><td colspan="2">'+esc(g.t)+'</td></tr>';g.l.forEach(function(l){h+='<tr class="'+(l.e?"est":"")+'"><td>'+esc(l.t)+'</td><td>'+eur(l.v)+'</td></tr>';});});
- $("tab").innerHTML=h;
+ $("tab").innerHTML=h;wizSub(r);
  $("tot").textContent=eur(r.total);
  $("totsub").textContent=($("vlibre").value.trim()?$("vlibre").value.trim()+" : ":"")+"dont "+eur(r.hors)+" de taxes, formalités et frais en plus du prix d'achat";
  $("alerts").innerHTML="";
@@ -506,7 +532,7 @@ if(typeof document!=="undefined"&&document.getElementById("orig")){
  REG.forEach(function(r,k){var o=document.createElement("option");o.value=k;o.textContent=r[0]+" ("+String(r[1]).replace(".",",")+" €/CV)";$("reg").appendChild(o)});
  ["orig","lieuDep","lieuArr","kmConv","fretZone","prefPays","prixDev","taux","transFront","convoy","prefTaux","vtype","dmc","km","vlibre","cv","mas","ener","recep","co2","norme","phev","handi","reg","fraisDouane","conf","confCost","ctCost","cpiCost","plaqueType","plaques","mandat"].forEach(function(k){$(k).addEventListener("input",render);$(k).addEventListener("change",render);if(k==='lieuDep'||k==='lieuArr'){var bx=sugBox(k);var pickH=function(e){var t=e.target;while(t&&!(t.getAttribute&&t.getAttribute('data-v')!==null))t=t.parentNode;if(t){e.preventDefault();sugPick(k,t.getAttribute('data-v'))}};bx.addEventListener('mousedown',pickH);bx.addEventListener('touchend',pickH);bx.addEventListener('click',pickH);$(k).addEventListener('blur',function(){setTimeout(function(){sugShow(k,[])},200)});$(k).addEventListener('change',function(){applyConv(false)});$(k).addEventListener('input',function(){clearTimeout(sugTimer[k]);sugTimer[k]=setTimeout(function(){sugUpdate(k)},250);clearTimeout(convTimer);convTimer=setTimeout(function(){applyConv(false)},(LIEUX[$(k).value.trim()]||ADR[$(k).value.trim()])?0:1500)})}if(k==='taux')$(k).addEventListener('input',function(){});if(k==='plaqueType')$(k).addEventListener('change',function(){$('plaques').value=$('plaqueType').value==='etr'?90:40;render()});if(k==='kmConv')$(k).addEventListener('input',function(){applyConv(true);render()});if(k==='conf')$(k).addEventListener('change',function(){$('confCost').value={coc:300,homop:1500,homoc:4500}[$('conf').value];render()});if(k==='fretZone')$(k).addEventListener('change',function(){applyFret();render()});if(k==='orig')$(k).addEventListener('change',function(){if($('orig').value==='us')$('fretZone').value='usa';applyFret();render()});if(k==='prefPays')$(k).addEventListener('change',function(){var o=$('prefPays');if(o.value!=='')$('prefTaux').value=o.value;var tx=o.options[o.selectedIndex].text;var mz=[[/Japon/,'jp'],[/Corée/,'kr'],[/Singapour/,'sg'],[/Vietnam/,'vn'],[/Royaume-Uni/,'uk'],[/Canada/,'can']];for(var q=0;q<mz.length;q++)if(mz[q][0].test(tx)){$('fretZone').value=mz[q][1];applyFret();break}render()})});
  var d0=new Date();d0.setFullYear(d0.getFullYear()-6);$("dmc").value=d0.toISOString().slice(0,10);$("dmc").max=new Date().toISOString().slice(0,10);
- vehInit();$("vmarque").addEventListener("change",function(){vehAnnees();render()});$("vannee").addEventListener("change",function(){vehModels();render()});$("vmodele").addEventListener("change",function(){vehVersions();render()});$("vversion").addEventListener("change",function(){vehPick();render()});devInit();$("devise").addEventListener("change",function(){devSetRate();render()});$("taux").addEventListener("input",devHint);applyFret();render();devLive();
+ vehInit();$("vmarque").addEventListener("change",function(){vehAnnees();render()});$("vannee").addEventListener("change",function(){vehModels();render()});$("vmodele").addEventListener("change",function(){vehVersions();render()});$("vversion").addEventListener("change",function(){vehPick();render()});wizInit();devInit();$("devise").addEventListener("change",function(){devSetRate();render()});$("taux").addEventListener("input",devHint);applyFret();render();devLive();
 }
 </script>
 </body>
