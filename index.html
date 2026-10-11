@@ -229,17 +229,22 @@ body.wiz{padding-bottom:100px}
 </div>
 </div>
 
-<div class="card endc res" id="endres"><h2>Coût complet de l'import</h2>
+<div class="card endc res" id="endres"><h2>5. Coût complet de l'import</h2>
 <p class="tot" id="tot">–</p>
 <p class="totsub" id="totsub"></p>
+<p class="note">Seul le total est affiché ici. Le détail complet (poste par poste, formalités à accomplir, sources officielles) est fourni dans le rapport PDF.</p>
+<button type="button" class="stbtn pdfbtn" id="pdfbtn">Obtenir le détail en PDF</button>
+<p class="note" id="pdfmsg"></p></div>
+
+<div id="pdfsrc" style="display:none">
 <div id="alerts"></div>
 <table id="tab"></table>
 <p class="note">Estimation indicative. Les lignes en gris sont des estimations (barème 2026 appliqué à un import, ou montants non vérifiés). Vérifiez le montant exact sur <b>service-public.gouv.fr</b> (simulateur du coût du certificat d'immatriculation), auprès de la <b>douane</b> et de l'<b>ANTS</b> avant tout achat.</p></div>
 
-<div class="card endc"><h2>Formalités et obligations</h2>
+<h2>Formalités et obligations</h2><div>
 <ul class="chkl" id="chkl"></ul></div>
 
-<div class="card endc"><h2>Sources officielles</h2>
+<h2>Sources officielles</h2><div>
 <ul class="chkl">
 <li><a href="https://www.douane.gouv.fr/fiche/achat-dun-vehicule-letranger-ou-dans-un-dom-com" target="_blank" rel="noopener">Douane – achat d'un véhicule à l'étranger</a> (droits de douane, TVA, certificat 846 A, assurance frontière)</li>
 <li><a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F2991" target="_blank" rel="noopener">Service-Public – achat d'un véhicule dans l'UE</a> (TVA, quitus fiscal)</li>
@@ -249,8 +254,9 @@ body.wiz{padding-bottom:100px}
 <li><a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F35947" target="_blank" rel="noopener">Service-Public – malus CO₂</a> et <a href="https://www.service-public.gouv.fr/simulateur/calcul/cout-certificat-immatriculation" target="_blank" rel="noopener">simulateur officiel du coût du certificat d'immatriculation</a></li>
 <li><a href="https://eur-lex.europa.eu/legal-content/FR/TXT/PDF/?uri=OJ%3AL_202601455" target="_blank" rel="noopener">Règlement (UE) 2026/1455</a> (droit de douane à 0 % pour les véhicules d'origine américaine)</li>
 </ul></div>
+</div>
 </main>
-<div id="bar" class="hide"><div class="barrow"><span>Total estimé</span><b id="barv">0 €</b></div><div class="prog"><div class="progf" id="progf"></div></div><div class="progl" id="progl">Progression : 0 / 4 blocs vus</div></div>
+<div id="bar" class="hide"><div class="barrow"><span>Total estimé</span><b id="barv">0 €</b></div><div class="prog"><div class="progf" id="progf"></div></div><div class="progl" id="progl">Progression : 0 / 5 blocs vus</div></div>
 <script>
 
 // Tarif du cheval fiscal par région (€) – à vérifier / mettre à jour chaque année
@@ -498,15 +504,20 @@ function read(){convEur();return{orig:$("orig").value,prix:+$("prix").value||0,t
  vtype:$("vtype").value,dmc:$("dmc").value,km:+$("km").value||0,cv:+$("cv").value||1,mas:+$("mas").value||0,ener:$("ener").value,recep:$("recep").value,co2:+$("co2").value||0,norme:$("norme").value,
  phev:$("phev").checked,handi:$("handi").checked,reg:+$("reg").value,fraisDouane:+$("fraisDouane").value||0,conf:$("conf").value,confCost:+$("confCost").value||0,ctCost:+$("ctCost").value||0,cpiCost:+$("cpiCost").value||0,plaques:+$("plaques").value||0,plaqueType:$("plaqueType").value,mandat:+$("mandat").value||0};}
 
-var WZ={n:0,open:1,on:false,seen:[0,0,0,0,0]};
+var PAY_URL="";var PAY_PRIX="4,90 \u20ac";var PAY_CODE="";
+var WZ={n:0,open:1,on:false,seen:[0,0,0,0,0,0]};
+function pdfPaid(){try{if(!PAY_CODE)return false;return location.search.indexOf("pdf="+PAY_CODE)>=0}catch(e){return false}}
+function pdfUi(){var b=$("pdfbtn"),m=$("pdfmsg");if(!b)return;if(pdfPaid()){b.textContent="T\u00e9l\u00e9charger le rapport PDF";m.textContent="Paiement confirm\u00e9. Dans la fen\u00eatre qui s\u2019ouvre, choisissez \u00ab Enregistrer au format PDF \u00bb."}else{b.textContent="Obtenir le d\u00e9tail en PDF \u2013 "+PAY_PRIX;m.textContent=PAY_URL?"Paiement s\u00e9curis\u00e9 sur la page de notre prestataire de paiement. Aucune donn\u00e9e bancaire n\u2019est saisie sur ce site.":"Le paiement en ligne sera disponible tr\u00e8s prochainement."}}
+function pdfGo(){if(!pdfPaid()){if(PAY_URL){try{window.open(PAY_URL,"_blank")}catch(e){}}return}
+ var w=window.open("","_blank");if(!w)return;var d=new Date();var h='<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Rapport co\u00fbt complet import</title><style>body{font:14px/1.45 Arial,sans-serif;color:#111;max-width:760px;margin:20px auto;padding:0 16px}h1{font-size:22px}h2{font-size:16px;margin-top:22px}table{width:100%;border-collapse:collapse}td{padding:4px 6px;border-bottom:1px solid #ddd}td:last-child{text-align:right;white-space:nowrap}tr.grp td{font-weight:700;background:#eee}tr.est td{color:#666}.t{font-size:26px;font-weight:700}.note{font-size:12px;color:#444}a{color:#111}</style></head><body><h1>Rapport : co\u00fbt complet de l\u2019import</h1><p class="note">\u00c9tabli le '+d.toLocaleDateString("fr-FR")+'</p><p>'+esc($("totsub").textContent)+'</p><p class="t">'+esc($("tot").textContent)+'</p><h2>D\u00e9tail poste par poste</h2>'+$("pdfsrc").innerHTML+'</body></html>';w.document.open();w.document.write(h);w.document.close();setTimeout(function(){try{w.focus();w.print()}catch(e){}},400)}
 function wizSums(r){var a=[0,0,0,0,0];r.groups.forEach(function(g){var v=0;g.l.forEach(function(l){if(!l.i)v+=l.v});var k=g.t==="Achat"?1:g.t==="Transport et convoyage"?2:/^Certificat/.test(g.t)?3:4;a[k]+=v});return a}
 function wizShow(){if(!WZ.on)return;if(WZ.open>=1&&WZ.open<=4)WZ.seen[WZ.open]=1;for(var k=1;k<=4;k++){var c=$("st"+k),cl=c.className.replace(/ (open|closed|locked|done)/g,"");var st=k>WZ.n?"locked":(k===WZ.open?"open":"closed");if(WZ.seen[k]&&k!==WZ.open)st+=" done";c.className=cl+" "+st}
  var ends=document.querySelectorAll(".endc");for(var j=0;j<ends.length;j++){ends[j].className=ends[j].className.replace(/ ?locked/g,"")+(WZ.n>=5?"":" locked")}
- if(WZ.open>=1&&WZ.open<=4)WZ.seen[WZ.open]=1;var c=WZ.seen[1]+WZ.seen[2]+WZ.seen[3]+WZ.seen[4];$("progf").style.width=(c*25)+"%";$("progl").textContent="Progression : "+c+" / 4 blocs vus"+(c===4?" \u2713":"");$("bar").className=""}
+ if(WZ.open>=1&&WZ.open<=4)WZ.seen[WZ.open]=1;var c=WZ.seen[1]+WZ.seen[2]+WZ.seen[3]+WZ.seen[4]+WZ.seen[5];$("progf").style.width=(c*20)+"%";$("progl").textContent="Progression : "+c+" / 5 blocs vus"+(c===5?" \u2713":"");$("bar").className=""}
 function wizSub(r){if(!WZ.on)return;var a=wizSums(r),run=0;for(var k=1;k<=4;k++){var e=$("ss"+k);if(e)e.textContent=(k<=WZ.n||k===WZ.open)?"Sous-total : "+eur(a[k]):"";run+=a[k]}run=r.total;$("barv").textContent=eur(run)}
 function wizGo(k){WZ.open=k;wizShow();render();try{$("st"+(k<=4?k:4)).scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}
-function wizInit(){try{var k;for(k=1;k<=4;k++){(function(k){var c=$("st"+k),h=c.getElementsByTagName("h2")[0];var sp=document.createElement("span");sp.className="stsub";sp.id="ss"+k;h.appendChild(sp);var b=document.createElement("div");b.className="stbody";while(h.nextSibling)b.appendChild(h.nextSibling);c.appendChild(b);var bt=document.createElement("button");bt.type="button";bt.className="stbtn";bt.textContent=k<4?"Continuer : "+["","Transport et convoyage","Certificat d\u2019immatriculation","Frais \u00e0 saisir"][k]+" \u2192":"Voir le co\u00fbt complet";bt.addEventListener("click",function(){if(k===4){WZ.open=0;wizShow();render();try{$("endres").scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}else wizGo(k+1)});b.appendChild(bt);h.addEventListener("click",function(){if(k>WZ.n)return;WZ.open=(WZ.open===k)?0:k;wizShow();render()})})(k)}
- document.body.className+=" wiz";WZ.on=true;WZ.n=5;WZ.open=0;wizShow()}catch(e){try{document.body.className=document.body.className.replace(/ ?wiz/g,"")}catch(e2){}WZ.on=false}}
+function wizInit(){try{var k;for(k=1;k<=4;k++){(function(k){var c=$("st"+k),h=c.getElementsByTagName("h2")[0];var sp=document.createElement("span");sp.className="stsub";sp.id="ss"+k;h.appendChild(sp);var b=document.createElement("div");b.className="stbody";while(h.nextSibling)b.appendChild(h.nextSibling);c.appendChild(b);var bt=document.createElement("button");bt.type="button";bt.className="stbtn";bt.textContent=k<4?"Continuer : "+["","Transport et convoyage","Certificat d\u2019immatriculation","Frais \u00e0 saisir"][k]+" \u2192":"Voir le co\u00fbt complet";bt.addEventListener("click",function(){if(k===4){WZ.open=0;WZ.seen[5]=1;wizShow();render();try{$("endres").scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}else wizGo(k+1)});b.appendChild(bt);h.addEventListener("click",function(){if(k>WZ.n)return;WZ.open=(WZ.open===k)?0:k;wizShow();render()})})(k)}
+ pdfUi();var pb=$("pdfbtn");if(pb)pb.addEventListener("click",pdfGo);document.body.className+=" wiz";WZ.on=true;WZ.n=5;WZ.open=0;wizShow()}catch(e){try{document.body.className=document.body.className.replace(/ ?wiz/g,"")}catch(e2){}WZ.on=false}}
 function render(){
  var i=read(),now=new Date(),r=compute(i,now);
  var tv=0,tvl="";r.groups.forEach(function(g){g.l.forEach(function(l){if(!l.i&&/^TVA/.test(l.t)){tv+=l.v;tvl=l.t}})});
