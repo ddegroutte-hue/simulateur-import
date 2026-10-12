@@ -7,9 +7,9 @@
 <style>
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#f5f6fa;--card:#fff;--tx:#1b1f2a;--mut:#667085;--ac:#000091;--acbg:#e8eaff;--bd:#d9dce6;--ok:#0a7d4b;--warn:#b54708;--warnbg:#fff4e5}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141c;--card:#1c2030;--tx:#eef0f7;--mut:#9aa3b8;--ac:#8c9bff;--acbg:#262c4d;--bd:#323850;--ok:#4cd694;--warn:#fdb022;--warnbg:#3a2a10}}
-:root[data-theme="dark"]{--bg:#12141c;--card:#1c2030;--tx:#eef0f7;--mut:#9aa3b8;--ac:#8c9bff;--acbg:#262c4d;--bd:#323850;--ok:#4cd694;--warn:#fdb022;--warnbg:#3a2a10}
+--bg:#f3f6f4;--card:#fff;--tx:#14211c;--mut:#5f6f68;--ac:#0b5d4b;--ac2:#d9a21b;--onac:#fff;--acbg:#e3f3ec;--bd:#d8e2dc;--ok:#0a7d4b;--warn:#b54708;--warnbg:#fff4e5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1713;--card:#16231d;--tx:#ecf4f0;--mut:#93a89f;--ac:#4cc9a0;--ac2:#f0c04a;--onac:#0e1713;--acbg:#1c3329;--bd:#264036;--ok:#4cd694;--warn:#fdb022;--warnbg:#3a2a10}}
+:root[data-theme="dark"]{--bg:#0e1713;--card:#16231d;--tx:#ecf4f0;--mut:#93a89f;--ac:#4cc9a0;--ac2:#f0c04a;--onac:#0e1713;--acbg:#1c3329;--bd:#264036;--ok:#4cd694;--warn:#fdb022;--warnbg:#3a2a10}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
@@ -54,10 +54,10 @@ a{color:var(--ac)}
 .wiz .st.closed .stbody{display:none}
 .wiz .st.locked,.wiz .endc.locked{display:none}
 .wiz .st.done>h2::before{content:"\2713";color:var(--ok);margin-right:4px}
-.stbtn{scroll-margin-bottom:110px;display:block;width:100%;margin-top:18px;padding:14px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer}
+.stbtn{scroll-margin-bottom:110px;display:block;width:100%;margin-top:18px;padding:14px;border:0;border-radius:10px;background:var(--ac);color:var(--onac);font-size:1.05rem;font-weight:700;cursor:pointer}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stbtn{color:#12141c}}
 #bar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:block;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--ac);box-shadow:0 -4px 16px rgba(0,0,0,.12);font-size:1rem}
-.barrow{display:flex;justify-content:space-between;align-items:center}.prog{position:relative;height:26px;margin-top:6px}.road{position:absolute;left:0;right:0;top:20px;height:2px;border-radius:1px;background:var(--bd)}.progf{position:absolute;left:0;top:20px;height:2px;width:0;background:var(--ac);border-radius:1px;transition:width .6s ease}.dot{position:absolute;top:18px;width:6px;height:6px;border-radius:50%;background:var(--card);border:1.5px solid var(--bd);box-sizing:border-box;transform:translateX(-50%)}.dot.on{background:var(--ac);border-color:var(--ac)}.car{position:absolute;top:0;left:0;width:38px;height:17px;color:var(--ac);transition:left .6s ease}.car svg{display:block;width:38px;height:17px}.progl{font-size:.75rem;color:var(--mut);margin-top:4px}
+.barrow{display:flex;justify-content:space-between;align-items:center}.prog{position:relative;height:26px;margin-top:6px}.road{position:absolute;left:0;right:0;top:20px;height:2px;border-radius:1px;background:var(--bd)}.progf{position:absolute;left:0;top:20px;height:3px;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:1px;transition:width .6s ease}.dot{position:absolute;top:18px;width:6px;height:6px;border-radius:50%;background:var(--card);border:1.5px solid var(--bd);box-sizing:border-box;transform:translateX(-50%)}.dot.on{background:var(--ac2);border-color:var(--ac2)}.car{position:absolute;top:0;left:0;width:38px;height:17px;color:var(--ac);transition:left .6s ease}.car svg{display:block;width:38px;height:17px}.progl{font-size:.75rem;color:var(--mut);margin-top:4px}
 #bar b{font-size:1.35rem;color:var(--ac)}
 #bar.hide{display:none}
 body.wiz{padding-bottom:100px}
