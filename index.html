@@ -57,7 +57,7 @@ a{color:var(--ac)}
 .stbtn{scroll-margin-bottom:110px;display:block;width:100%;margin-top:18px;padding:14px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stbtn{color:#12141c}}
 #bar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:block;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--ac);box-shadow:0 -4px 16px rgba(0,0,0,.12);font-size:1rem}
-.barrow{display:flex;justify-content:space-between;align-items:center}.prog{height:8px;border-radius:4px;background:var(--bd);margin-top:8px;overflow:hidden}.progf{height:100%;width:0;background:var(--ok);border-radius:4px;transition:width .35s}.progl{font-size:.75rem;color:var(--mut);margin-top:4px}
+.barrow{display:flex;justify-content:space-between;align-items:center}.prog{position:relative;height:26px;margin-top:6px}.road{position:absolute;left:0;right:0;top:15px;height:8px;border-radius:4px;background:var(--bd);background-image:repeating-linear-gradient(90deg,transparent 0 10px,rgba(255,255,255,.55) 10px 18px)}.progf{position:absolute;left:0;top:15px;height:8px;width:0;background:var(--ok);border-radius:4px;transition:width .6s ease}.car{position:absolute;top:-1px;left:0;font-size:22px;line-height:24px;transform:scaleX(-1);transition:left .6s ease}.flag{position:absolute;right:0;top:-1px;font-size:20px;line-height:24px}.car.go{animation:vroum .5s ease 1}@keyframes vroum{0%{top:-1px}30%{top:-5px}60%{top:0}100%{top:-1px}}.progl{font-size:.75rem;color:var(--mut);margin-top:4px}
 #bar b{font-size:1.35rem;color:var(--ac)}
 #bar.hide{display:none}
 body.wiz{padding-bottom:100px}
@@ -255,7 +255,7 @@ body.wiz{padding-bottom:100px}
 </ul></div>
 </div>
 </main>
-<div id="bar" class="hide"><div class="barrow"><span>Total estimé</span><b id="barv">0 €</b></div><div class="prog"><div class="progf" id="progf"></div></div><div class="progl" id="progl">Progression : 0 / 5 blocs vus</div></div>
+<div id="bar" class="hide"><div class="barrow"><span>Total estimé</span><b id="barv">0 €</b></div><div class="prog"><div class="road"></div><div class="progf" id="progf"></div><span class="car" id="car" aria-hidden="true">🚗</span><span class="flag" aria-hidden="true">🏁</span></div><div class="progl" id="progl">Progression : 0 / 5 blocs vus</div></div>
 <script>
 
 // Tarif du cheval fiscal par région (€) – à vérifier / mettre à jour chaque année
@@ -512,7 +512,7 @@ function pdfGo(){if(!pdfPaid()){if(PAY_URL){try{window.open(PAY_URL,"_blank")}ca
 function wizSums(r){var a=[0,0,0,0,0];r.groups.forEach(function(g){var v=0;g.l.forEach(function(l){if(!l.i)v+=l.v});var k=g.t==="Achat"?1:g.t==="Transport et convoyage"?2:/^Certificat/.test(g.t)?3:4;a[k]+=v});return a}
 function wizShow(){if(!WZ.on)return;if(WZ.open>=1&&WZ.open<=4)WZ.seen[WZ.open]=1;for(var k=1;k<=4;k++){var c=$("st"+k),cl=c.className.replace(/ (open|closed|locked|done)/g,"");var st=k>WZ.n?"locked":(k===WZ.open?"open":"closed");if(WZ.seen[k]&&k!==WZ.open)st+=" done";c.className=cl+" "+st}
  var ends=document.querySelectorAll(".endc");for(var j=0;j<ends.length;j++){ends[j].className=ends[j].className.replace(/ ?locked/g,"")+(WZ.n>=5?"":" locked")}
- if(WZ.open>=1&&WZ.open<=4)WZ.seen[WZ.open]=1;var c=WZ.seen[1]+WZ.seen[2]+WZ.seen[3]+WZ.seen[4]+WZ.seen[5];$("progf").style.width=(c*20)+"%";$("progl").textContent="Progression : "+c+" / 5 blocs vus"+(c===5?" \u2713":"");$("bar").className=""}
+ if(WZ.open>=1&&WZ.open<=4)WZ.seen[WZ.open]=1;var c=WZ.seen[1]+WZ.seen[2]+WZ.seen[3]+WZ.seen[4]+WZ.seen[5];var pp=c/5;$("progf").style.width=c?"calc((100% - 26px) * "+pp+" + 13px)":"0";var cr=$("car");cr.style.left="calc((100% - 26px) * "+pp+")";if(WZ.lastc!==c){WZ.lastc=c;cr.className="car";void cr.offsetWidth;cr.className="car go"}$("progl").textContent="Progression : "+c+" / 5 blocs vus"+(c===5?" \u2713":"");$("bar").className=""}
 function wizSub(r){if(!WZ.on)return;var a=wizSums(r),run=0;for(var k=1;k<=4;k++){var e=$("ss"+k);if(e)e.textContent=(k<=WZ.n||k===WZ.open)?"Sous-total : "+eur(a[k]):"";run+=a[k]}run=r.total;$("barv").textContent=eur(run)}
 function wizGo(k){WZ.open=k;wizShow();render();try{$("st"+(k<=4?k:4)).scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}
 function wizInit(){try{var k;for(k=1;k<=4;k++){(function(k){var c=$("st"+k),h=c.getElementsByTagName("h2")[0];var sp=document.createElement("span");sp.className="stsub";sp.id="ss"+k;h.appendChild(sp);var b=document.createElement("div");b.className="stbody";while(h.nextSibling)b.appendChild(h.nextSibling);c.appendChild(b);var bt=document.createElement("button");bt.type="button";bt.className="stbtn";bt.textContent=k<4?"Continuer : "+["","Transport et convoyage","Certificat d\u2019immatriculation","Frais \u00e0 saisir"][k]+" \u2192":"Voir le co\u00fbt complet";bt.addEventListener("click",function(){if(k===4){WZ.open=0;WZ.seen[5]=1;wizShow();render();try{$("endres").scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}else wizGo(k+1)});b.appendChild(bt);h.addEventListener("click",function(){if(k>WZ.n)return;WZ.open=(WZ.open===k)?0:k;wizShow();render()})})(k)}
