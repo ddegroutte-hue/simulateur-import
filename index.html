@@ -7,9 +7,9 @@
 <style>
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#000;--card:#101713;--tx:#ecf4f0;--mut:#93a89f;--ac:#4cc9a0;--ac2:#f0c04a;--onac:#06100b;--acbg:#14261d;--bd:#26362e;color-scheme:dark;--ok:#0a7d4b;--warn:#b54708;--warnbg:#fff4e5}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#101713;--tx:#ecf4f0;--mut:#93a89f;--ac:#4cc9a0;--ac2:#f0c04a;--onac:#06100b;--acbg:#14261d;--bd:#26362e;--ok:#4cd694;--warn:#fdb022;--warnbg:#3a2a10}}
-:root[data-theme="dark"]{--bg:#000;--card:#101713;--tx:#ecf4f0;--mut:#93a89f;--ac:#4cc9a0;--ac2:#f0c04a;--onac:#06100b;--acbg:#14261d;--bd:#26362e;--ok:#4cd694;--warn:#fdb022;--warnbg:#3a2a10}
+--bg:#000;--card:#101713;--tx:#fff;--mut:#d3dbd7;--ac:#4cc9a0;--ac2:#f0c04a;--onac:#06100b;--acbg:#14261d;--bd:#26362e;color-scheme:dark;--ok:#0a7d4b;--warn:#b54708;--warnbg:#fff4e5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#101713;--tx:#fff;--mut:#d3dbd7;--ac:#4cc9a0;--ac2:#f0c04a;--onac:#06100b;--acbg:#14261d;--bd:#26362e;--ok:#4cd694;--warn:#fdb022;--warnbg:#3a2a10}}
+:root[data-theme="dark"]{--bg:#000;--card:#101713;--tx:#fff;--mut:#d3dbd7;--ac:#4cc9a0;--ac2:#f0c04a;--onac:#06100b;--acbg:#14261d;--bd:#26362e;--ok:#4cd694;--warn:#fdb022;--warnbg:#3a2a10}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
@@ -17,8 +17,8 @@ main{max-width:680px;margin:0 auto;padding:20px 16px 48px}
 h1{font-size:1.6rem;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em}.kick{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ac);margin:0 0 4px}
 .sub{color:var(--mut);margin:0 0 20px;font-size:.92rem}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px}
-h2{font-size:1rem;margin:0 0 4px;color:var(--ac)}
-h3{font-size:.9rem;margin:16px 0 6px;color:var(--ac)}
+h2{font-size:1rem;margin:0 0 4px;color:#fff}
+h3{font-size:.9rem;margin:16px 0 6px;color:#fff}
 label{display:block;font-size:.88rem;font-weight:600;margin:12px 0 4px}
 select,input[type=number],input[type=date],input[type=text]{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:1rem}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -28,12 +28,12 @@ select,input[type=number],input[type=date],input[type=text]{width:100%;padding:1
 .hint{font-size:.78rem;color:var(--mut);margin-top:3px}
 .perso{font-size:.72rem;font-weight:400;color:var(--warn)}
 .res{background:var(--acbg);border-color:var(--ac)}
-.tot{font-size:2rem;font-weight:700;color:var(--ac);margin:0}
+.tot{font-size:2rem;font-weight:700;color:#fff;margin:0}
 .totsub{color:var(--mut);font-size:.88rem;margin:0 0 8px}
 table{width:100%;border-collapse:collapse;font-size:.9rem}
 td{padding:6px 0;border-bottom:1px solid var(--bd);vertical-align:top}
 td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
-tr.grp td{font-weight:700;color:var(--ac);border-bottom:2px solid var(--ac);padding-top:14px}
+tr.grp td{font-weight:700;color:#fff;border-bottom:2px solid var(--ac);padding-top:14px}
 tr.sub td{font-weight:700}
 tr.est td:first-child{color:var(--mut)}
 .alert{background:var(--warnbg);color:var(--warn);border-radius:8px;padding:10px 12px;font-size:.85rem;margin-top:10px}
@@ -44,10 +44,10 @@ a{color:var(--ac)}
 .hide{display:none}
 .fretDet{margin:6px 0 10px}.fretDet summary{cursor:pointer;font-size:13px;color:var(--accent,#1a56db);padding:4px 0}
 .sgw{position:relative}.sug{position:absolute;left:0;right:0;top:100%;z-index:20;background:var(--card);border:1px solid var(--bd);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);max-height:240px;overflow:auto;margin-top:2px}.sug.hide{display:none}.sg{padding:9px 10px;cursor:pointer;font-size:.92rem;border-bottom:1px solid var(--bd)}.sg:last-child{border-bottom:0}.sg:hover,.sg.on{background:var(--acbg)}
-.subh{font-size:.95rem;margin:14px 0 4px;color:var(--ac);font-weight:700}
+.subh{font-size:.95rem;margin:14px 0 4px;color:#fff;font-weight:700}
 
 .wiz .st>h2{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;margin:0}
-.wiz .st>h2 .stsub{font-size:.85rem;font-weight:700;background:var(--acbg);color:var(--ac);border-radius:999px;padding:4px 12px;white-space:nowrap}
+.wiz .st>h2 .stsub{font-size:.85rem;font-weight:700;background:var(--acbg);color:#fff;border-radius:999px;padding:4px 12px;white-space:nowrap}
 .wiz .st>h2 .stsub:empty{display:none}
 .wiz .st.closed>h2::after{content:"Modifier";font-size:.78rem;font-weight:600;color:var(--mut);margin-left:6px}
 .wiz .st.open>h2{margin-bottom:8px}
@@ -58,7 +58,7 @@ a{color:var(--ac)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stbtn{color:#12141c}}
 #bar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:block;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--ac);box-shadow:0 -4px 16px rgba(0,0,0,.12);font-size:1rem}
 .barrow{display:flex;justify-content:space-between;align-items:center}.prog{position:relative;height:26px;margin-top:6px}.road{position:absolute;left:0;right:0;top:20px;height:2px;border-radius:1px;background:var(--bd)}.progf{position:absolute;left:0;top:20px;height:3px;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:1px;transition:width .6s ease}.dot{position:absolute;top:18px;width:6px;height:6px;border-radius:50%;background:var(--card);border:1.5px solid var(--bd);box-sizing:border-box;transform:translateX(-50%)}.dot.on{background:var(--ac2);border-color:var(--ac2)}.car{position:absolute;top:0;left:0;width:38px;height:17px;color:var(--ac);transition:left .6s ease}.car svg{display:block;width:38px;height:17px}.progl{font-size:.75rem;color:var(--mut);margin-top:4px}
-#bar b{font-size:1.35rem;color:var(--ac)}
+#bar b{font-size:1.35rem;color:#fff}
 #bar.hide{display:none}
 body.wiz{padding-bottom:100px}
 </style>
