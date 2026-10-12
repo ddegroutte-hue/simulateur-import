@@ -229,11 +229,10 @@ body.wiz{padding-bottom:100px}
 </div>
 </div>
 
-<div class="card endc res" id="endres"><h2>5. Coût complet de l'import</h2>
+<div class="card endc res" id="endres"><h2>5. Total</h2>
 <p class="tot" id="tot">–</p>
-<p class="totsub" id="totsub"></p>
-<p class="note">Seul le total est affiché ici. Le détail complet (poste par poste, formalités à accomplir, sources officielles) est fourni dans le rapport PDF.</p>
-<button type="button" class="stbtn pdfbtn" id="pdfbtn">Obtenir le détail en PDF</button>
+<p class="totsub" id="totsub" style="display:none"></p>
+<button type="button" class="stbtn pdfbtn" id="pdfbtn">Obtenir le coût complet de l’import</button>
 <p class="note" id="pdfmsg"></p></div>
 
 <div id="pdfsrc" style="display:none">
@@ -507,7 +506,7 @@ function read(){convEur();return{orig:$("orig").value,prix:+$("prix").value||0,t
 var PAY_URL="";var PAY_PRIX="4,90 \u20ac";var PAY_CODE="";
 var WZ={n:0,open:1,on:false,seen:[0,0,0,0,0,0]};
 function pdfPaid(){try{if(!PAY_CODE)return false;return location.search.indexOf("pdf="+PAY_CODE)>=0}catch(e){return false}}
-function pdfUi(){var b=$("pdfbtn"),m=$("pdfmsg");if(!b)return;if(pdfPaid()){b.textContent="T\u00e9l\u00e9charger le rapport PDF";m.textContent="Paiement confirm\u00e9. Dans la fen\u00eatre qui s\u2019ouvre, choisissez \u00ab Enregistrer au format PDF \u00bb."}else{b.textContent="Obtenir le d\u00e9tail en PDF \u2013 "+PAY_PRIX;m.textContent=PAY_URL?"Paiement s\u00e9curis\u00e9 sur la page de notre prestataire de paiement. Aucune donn\u00e9e bancaire n\u2019est saisie sur ce site.":"Le paiement en ligne sera disponible tr\u00e8s prochainement."}}
+function pdfUi(){var b=$("pdfbtn"),m=$("pdfmsg");if(!b)return;if(pdfPaid()){b.textContent="T\u00e9l\u00e9charger le rapport PDF";m.textContent="Paiement confirm\u00e9. Dans la fen\u00eatre qui s\u2019ouvre, choisissez \u00ab Enregistrer au format PDF \u00bb."}else{b.textContent="Obtenir le co\u00fbt complet de l\u2019import \u2013 "+PAY_PRIX;m.textContent=PAY_URL?"Paiement s\u00e9curis\u00e9 sur la page de notre prestataire de paiement. Aucune donn\u00e9e bancaire n\u2019est saisie sur ce site.":"Le paiement en ligne sera disponible tr\u00e8s prochainement."}}
 function pdfGo(){if(!pdfPaid()){if(PAY_URL){try{window.open(PAY_URL,"_blank")}catch(e){}}return}
  var w=window.open("","_blank");if(!w)return;var d=new Date();var h='<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Rapport co\u00fbt complet import</title><style>body{font:14px/1.45 Arial,sans-serif;color:#111;max-width:760px;margin:20px auto;padding:0 16px}h1{font-size:22px}h2{font-size:16px;margin-top:22px}table{width:100%;border-collapse:collapse}td{padding:4px 6px;border-bottom:1px solid #ddd}td:last-child{text-align:right;white-space:nowrap}tr.grp td{font-weight:700;background:#eee}tr.est td{color:#666}.t{font-size:26px;font-weight:700}.note{font-size:12px;color:#444}a{color:#111}</style></head><body><h1>Rapport : co\u00fbt complet de l\u2019import</h1><p class="note">\u00c9tabli le '+d.toLocaleDateString("fr-FR")+'</p><p>'+esc($("totsub").textContent)+'</p><p class="t">'+esc($("tot").textContent)+'</p><h2>D\u00e9tail poste par poste</h2>'+$("pdfsrc").innerHTML+'</body></html>';w.document.open();w.document.write(h);w.document.close();setTimeout(function(){try{w.focus();w.print()}catch(e){}},400)}
 function wizSums(r){var a=[0,0,0,0,0];r.groups.forEach(function(g){var v=0;g.l.forEach(function(l){if(!l.i)v+=l.v});var k=g.t==="Achat"?1:g.t==="Transport et convoyage"?2:/^Certificat/.test(g.t)?3:4;a[k]+=v});return a}
