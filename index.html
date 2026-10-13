@@ -154,6 +154,11 @@ body.wiz{padding-bottom:100px}
 <input type="number" id="convoy" min="0" step="50" value="0">
 <div class="hint"><a id="gmaps" href="https://www.google.com/maps/dir/" target="_blank" rel="noopener">Vérifier le trajet sur Google Maps ↗</a> (ouvre l'itinéraire dans un nouvel onglet ; reportez les kilomètres affichés dans « Distance estimée »)</div>
 <div class="hint" id="convHint">Saisissez un départ et une arrivée (adresse complète : numéro, rue, code postal, ville ; ou simplement une ville ou un port) : la distance routière réelle est calculée automatiquement, puis multipliée par 1,30 €. Vous pouvez corriger les kilomètres ou le montant.</div>
+<h3 class="subh">Circulation avant l'immatriculation</h3>
+<label for="cpiCost">CPI (certificat provisoire d'immatriculation) (€)</label><input type="number" id="cpiCost" min="0" step="1" value="120">
+<div><label for="plaqueType">Plaque provisoire</label><select id="plaqueType"><option value="fr">Plaque française (WW / plaque rose)</option><option value="etr">Plaque étrangère (pays d'achat)</option></select>
+<label for="plaques" style="margin-top:8px">Coût de la plaque provisoire (€)</label><input type="number" id="plaques" min="0" step="1" value="40"></div>
+
 </div>
 
 <div class="card st" id="st3"><h2>3. Certificat d'immatriculation</h2>
@@ -224,12 +229,7 @@ body.wiz{padding-bottom:100px}
 <label for="confCost">Coût du COC ou de l'homologation (essais, modifications, honoraires) (€)</label>
 <input type="number" id="confCost" min="0" step="50" value="300">
 <div id="ctBox"><label for="ctCost">Contrôle technique français (€)</label><input type="number" id="ctCost" min="0" step="5" value="81"><div class="hint">Prix moyen constaté prérempli : 81 €, moyenne de 10 catégories de véhicules (essence/diesel 80 €, hybride/électrique 87 €, gaz 95 €, 4x4 85 €, camionnette 84 €, camping-car 86 €, collection 81 €, voiturette 75 €, moto 71 €, cyclomoteur 67 €). Source : cteasy.com, d'après les tarifs déclarés à la DGCCRF. Les centres fixent librement leur prix (70 à 89 € pour 8 centres sur 10).</div></div>
-<label for="cpiCost">CPI (certificat provisoire d'immatriculation) (€)</label><input type="number" id="cpiCost" min="0" step="1" value="120">
-<div class="row2">
-<div><label for="plaqueType">Plaque provisoire</label><select id="plaqueType"><option value="fr">Plaque française (WW / plaque rose)</option><option value="etr">Plaque étrangère (pays d'achat)</option></select>
-<label for="plaques" style="margin-top:8px">Coût de la plaque provisoire (€)</label><input type="number" id="plaques" min="0" step="1" value="40"></div>
 <div><label for="mandat">Mandataire / frais de dossier (€)</label><input type="number" id="mandat" min="0" step="5" value="1800"></div>
-</div>
 </div>
 
 <div class="card endc res" id="endres"><h2>5. Total</h2>
@@ -357,9 +357,11 @@ function compute(i,now){
  // 1. Achat
  var g1=grp("Achat");
  add(g1,"Prix d'achat du véhicule",i.prix);
- if((!ue&&i.transFront>0)||i.convoy>0){var gT=grp("Transport et convoyage");
+ if((!ue&&i.transFront>0)||i.convoy>0||i.cpiCost>0||i.plaques>0){var gT=grp("Transport et convoyage");
   if(!ue&&i.transFront>0)add(gT,"Transport en conteneur et assurance jusqu'au port d'arrivée",i.transFront);
-  if(i.convoy>0)add(gT,ue?"Convoyage":"Convoyage jusqu'à chez vous",i.convoy);}
+  if(i.convoy>0)add(gT,ue?"Convoyage":"Convoyage jusqu'à chez vous",i.convoy);
+  if(i.cpiCost>0)add(gT,"CPI (certificat provisoire d'immatriculation)",i.cpiCost);
+  if(i.plaques>0)add(gT,i.plaqueType==="etr"?"Plaque provisoire étrangère (pays d'achat)":"Plaque provisoire française (WW)",i.plaques);}
  // 2. Taxes d'import
  var g2=grp("Taxes à l'import");
  var neufFisc=(mois<6||i.km<6000);
@@ -382,9 +384,7 @@ function compute(i,now){
  var g3=grp("Conformité et contrôle");
  if(i.confCost>0)add(g3,i.conf==="coc"?"Certificat de conformité européen (COC)":(i.conf==="homop"?"Homologation partielle (DREAL)":"Homologation complète (DREAL)"),i.confCost);
  if(age>=4&&i.ctCost>0)add(g3,"Contrôle technique français (véhicule de plus de 4 ans)",i.ctCost);
- if(i.cpiCost>0)add(g3,"CPI (certificat provisoire d'immatriculation)",i.cpiCost);
- if(i.plaques>0)add(g3,i.plaqueType==="etr"?"Plaque provisoire étrangère (pays d'achat)":"Plaque provisoire française (WW)",i.plaques);
- if(g3.l.length===0)G.pop();
+  if(g3.l.length===0)G.pop();
  // 4. Carte grise
  var g4=grp("Certificat d'immatriculation (carte grise)");
  var reg=REG[i.reg],cv=Math.max(1,i.cv||1),y1=cv*reg[1],t1="Taxe régionale Y1 ("+cv+" CV × "+String(reg[1]).replace(".",",")+" €)";
