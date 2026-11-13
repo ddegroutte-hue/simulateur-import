@@ -63,6 +63,7 @@ a{color:var(--ac)}
 body.wiz{padding-bottom:100px}
 .hero{position:relative;margin:-20px -16px 14px;background:#000}.hero img{width:100%;height:230px;object-fit:cover;object-position:50% 52%;display:block}.hero:after{content:"";position:absolute;left:0;right:0;top:150px;height:80px;background:linear-gradient(180deg,rgba(0,0,0,0),#000);pointer-events:none}.heroin{position:relative;z-index:2;text-align:center;padding:0 12px;margin-top:-6px}.hk{margin:0;font-size:clamp(1.5rem,7vw,2.3rem);font-weight:800;font-style:italic;line-height:1;color:#fff;letter-spacing:.01em}.hc{margin:6px 0 0;font-size:clamp(.75rem,3.2vw,1rem);font-weight:600;font-style:italic;letter-spacing:.5em;text-indent:.5em;background:linear-gradient(90deg,#ffb703,#ff5a1f);-webkit-background-clip:text;background-clip:text;color:transparent}.hs{margin:4px 0 0;font-size:.6rem;font-style:italic;letter-spacing:.3em;text-indent:.3em;color:rgba(255,255,255,.72)}@media(min-width:700px){.hero{margin:-20px 0 18px;border-radius:0 0 18px 18px;overflow:hidden}.hero img{height:300px}.hero:after{top:220px}}
 .wiz .st>h2 .sttl{flex:1 0 100%}
+.rsm{padding:12px 0;border-top:1px solid var(--bd)}.rsm:first-child{border-top:0;padding-top:0}.rsm .rh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 12px}.rsm .rn{font-weight:700;color:var(--tx);min-width:0}.rsm .rv{font-weight:700;color:var(--ac);white-space:nowrap;font-variant-numeric:tabular-nums}.rsm .rl{color:var(--mut);font-size:.85rem;margin:4px 0 0;overflow-wrap:anywhere}.rsm.rt{border-top:2px solid var(--ac);margin-top:4px}.rsm.rt .rv{font-size:1.15rem}
 </style>
 </head>
 <body>
@@ -237,6 +238,10 @@ body.wiz{padding-bottom:100px}
 <p class="totsub" id="totsub" style="display:none"></p>
 <button type="button" class="stbtn pdfbtn" id="pdfbtn">Obtenir le coût complet de l’import – PDF – 4,90 €</button>
 <p class="note" id="pdfmsg"></p></div>
+
+<div class="card" id="resume"><h2>Résumé par bloc</h2>
+<div id="resBody"></div>
+<p class="note">Les montants poste par poste figurent dans le PDF du coût complet.</p></div>
 
 <div id="pdfsrc" style="display:none">
 <div id="alerts"></div>
@@ -520,6 +525,10 @@ function wizSub(r){if(!WZ.on)return;var a=wizSums(r),run=0;for(var k=1;k<=4;k++)
 function wizGo(k){WZ.open=k;wizShow();render();try{$("st"+(k<=4?k:4)).scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}
 function wizInit(){try{var k;for(k=1;k<=4;k++){(function(k){var c=$("st"+k),h=c.getElementsByTagName("h2")[0];var tt=document.createElement("span");tt.className="sttl";tt.textContent=h.textContent;h.textContent="";h.appendChild(tt);var sp=document.createElement("span");sp.className="stsub";sp.id="ss"+k;h.appendChild(sp);var b=document.createElement("div");b.className="stbody";while(h.nextSibling)b.appendChild(h.nextSibling);c.appendChild(b);var bt=document.createElement("button");bt.type="button";bt.className="stbtn";bt.textContent=k<4?"Continuer : "+["","Transport et convoyage","Certificat d\u2019immatriculation","Frais divers"][k]+" \u2192":"Voir le co\u00fbt complet";bt.addEventListener("click",function(){if(k===4){WZ.open=0;WZ.seen[5]=1;wizShow();render();try{$("endres").scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}else wizGo(k+1)});b.appendChild(bt);h.addEventListener("click",function(){if(k>WZ.n)return;WZ.open=(WZ.open===k)?0:k;wizShow();render()})})(k)}
  pdfUi();var pb=$("pdfbtn");if(pb)pb.addEventListener("click",pdfGo);document.body.className+=" wiz";WZ.on=true;WZ.n=5;WZ.open=0;wizShow()}catch(e){try{document.body.className=document.body.className.replace(/ ?wiz/g,"")}catch(e2){}WZ.on=false}}
+function wizResume(r){var el=$("resBody");if(!el)return;var nm=["","1. Achat","2. Transport et convoyage","3. Certificat d\u2019immatriculation","4. Frais divers"],it=[[],[],[],[],[]],sm=[0,0,0,0,0],h="",k;
+ r.groups.forEach(function(g){var b=g.t==="Achat"?1:g.t==="Transport et convoyage"?2:/^Certificat/.test(g.t)?3:4;g.l.forEach(function(l){if(l.i||!(l.v>0))return;sm[b]+=l.v;var t=String(l.t).split(" (")[0].replace(/^Base de calcul.*$/,"");if(t&&it[b].indexOf(t)<0)it[b].push(t)})});
+ for(k=1;k<=4;k++){h+='<div class="rsm"><div class="rh"><span class="rn">'+esc(nm[k])+'</span><span class="rv">'+eur(sm[k])+'</span></div><p class="rl">'+(it[k].length?esc(it[k].join(", ")):"Aucun poste à payer pour ce cas.")+'</p></div>'}
+ h+='<div class="rsm rt"><div class="rh"><span class="rn">5. Total</span><span class="rv">'+eur(r.total)+'</span></div></div>';el.innerHTML=h}
 function render(){
  var i=read(),now=new Date(),r=compute(i,now);
  var tv=0,tvl="";r.groups.forEach(function(g){g.l.forEach(function(l){if(!l.i&&/^TVA/.test(l.t)){tv+=l.v;tvl=l.t}})});
@@ -536,7 +545,7 @@ function render(){
  $("origHint").textContent={ue:"Aucun droit de douane. TVA française seulement si le véhicule a moins de 6 mois ou moins de 6 000 km.",tiers:"Droits de douane (10 % pour une voiture) puis TVA 20 % sur la valeur en douane + droits.",us:"Droit de douane à 0 % pour les véhicules d'origine américaine (règlement UE 2026/1455) ; TVA 20 % due.",pref:"Droits réduits ou nuls selon l'accord (certificat d'origine) ; TVA 20 % due."}[i.orig];
  var h="";
  r.groups.forEach(function(g){h+='<tr class="grp"><td colspan="2">'+esc(g.t)+'</td></tr>';g.l.forEach(function(l){h+='<tr class="'+(l.e?"est":"")+'"><td>'+esc(l.t)+'</td><td>'+eur(l.v)+'</td></tr>';});});
- $("tab").innerHTML=h;wizSub(r);
+ $("tab").innerHTML=h;wizSub(r);wizResume(r);
  $("tot").textContent=eur(r.total);
  $("totsub").textContent=($("vlibre").value.trim()?$("vlibre").value.trim()+" : ":"")+"dont "+eur(r.hors)+" de taxes, formalités et frais en plus du prix d'achat";
  $("alerts").innerHTML="";
